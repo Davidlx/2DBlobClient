@@ -53,7 +53,7 @@ var GameLayer = cc.Layer.extend({
         ball.setPosition(size.width/2, size.height/2);
         this.addChild(ball,0);
 
-        var REFRESH_RATE = 10;
+        var REFRESH_TIME = 10;
         var speed = 1;
         var mousePos;
         cc.eventManager.addListener({
@@ -69,9 +69,12 @@ var GameLayer = cc.Layer.extend({
                     var distance = Math.sqrt((diff_x * diff_x) + (diff_y * diff_y));
                     var sin = diff_y/distance;
                     var cos = diff_x/distance;
-                    ball.x = ball.x + speed*cos;
-                    ball.y = ball.y + speed*sin;
-        }, REFRESH_RATE);
+                    if(distance>1){
+                        ball.x = ball.x + speed*cos;
+                        ball.y = ball.y + speed*sin;
+                    }
+
+        }, REFRESH_TIME);
 
 
 
