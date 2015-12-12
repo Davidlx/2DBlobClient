@@ -118,7 +118,7 @@ function calculateSpeed(soucePoint,targetPoint,speed,size){//ball - source, mous
     if (tempSpeed != speed) {
         //upload server - angle changed
         //console.log("speed changed");
-        socket.emit('update_user_speed',index,sourcePoint.x,sourcePoint.y,tempSpeed,getUNIXTimestamp());
+        socket.emit('update_user_speed',index,soucePoint.x,soucePoint.y,tempSpeed,getUNIXTimestamp());
     }
     return tempSpeed;
 }
