@@ -58,7 +58,8 @@ var GameLayer = cc.Layer.extend({
         ball.setPosition(size.width/2, size.height/2);
         this.addChild(ball,0);
 
-        var REFRESH_RATE = 10;
+
+        var REFRESH_TIME = 10;
         var REGULAR_UPDATES_RATE = 100;
         var speed = 0;
         var angle = 0;
@@ -73,13 +74,14 @@ var GameLayer = cc.Layer.extend({
         },ball);
 
         window.setInterval(function(){
+
             angle = calculateAngle(mousePos,ball,angle);
             speed = calculateSpeed(mousePos,ball,speed,size);
             var sin = Math.sin(angle);
             var cos = Math.cos(angle);
             ball.x = ball.x - speed*cos;
             ball.y = ball.y - speed*sin;
-        }, REFRESH_RATE);
+        }, REFRESH_TIME);
 
         //regular updates
         window.setInterval(function(){
