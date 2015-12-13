@@ -1,4 +1,6 @@
-var socket = io('localhost:3000');
+var url = window.location.href;
+console.log(url);
+var socket = io(url);
 var index = 0;
 var GameLayer = cc.Layer.extend({
 
@@ -75,12 +77,12 @@ var GameLayer = cc.Layer.extend({
 
         window.setInterval(function(){
 
-            angle = calculateAngle(mousePos,ball,angle);
-            speed = calculateSpeed(mousePos,ball,speed,size);
+            angle = calculateAngle(ball,mousePos,angle);
+            speed = calculateSpeed(ball,mousePos,speed,size);
             var sin = Math.sin(angle);
             var cos = Math.cos(angle);
-            ball.x = ball.x - speed*cos;
-            ball.y = ball.y - speed*sin;
+            ball.x = ball.x + speed*cos;
+            ball.y = ball.y + speed*sin;
         }, REFRESH_TIME);
 
         //regular updates
@@ -119,8 +121,8 @@ function calculateSpeed(soucePoint,targetPoint,speed,size){//ball - source, mous
     var tempSpeed = calculateSpeedAlgorithm(soucePoint,targetPoint,size);
     if (tempSpeed != speed) {
         //upload server - angle changed
-        //console.log("speed changed");
         socket.emit('update_user_speed',index,soucePoint.x,soucePoint.y,tempSpeed,getUNIXTimestamp());
+        console.log("speed changed");
     }
     return tempSpeed;
 }
