@@ -46,19 +46,18 @@ var GameLayer = cc.Layer.extend({
             if(random_num == 3) food[food_index] = new cc.Sprite(res.food_purple_png);
             food[food_index].setAnchorPoint(0.5, 0.5);
             food[food_index].setPosition(food_pos_x, food_pos_y);
+            food[food_index].setTag(food_index);
             this.addChild(food[food_index],0);
+            //cc.log("Food " + food_index + " location : " + food[food_index].getPositionX() + " " + food[food_index].getPositionY());
             food_index++;
         }
 
         // demo ended
-
-
         var ball = new cc.Sprite(res.ball_png);
         ball.setAnchorPoint(0.5, 0.5);
         ball.setPosition(size.width/2, size.height/2);
+
         this.addChild(ball,0);
-
-
         var REFRESH_TIME = 10;
         var REGULAR_UPDATES_RATE = 100;
         var speed = 0;
@@ -81,6 +80,13 @@ var GameLayer = cc.Layer.extend({
             var cos = Math.cos(angle);
             ball.x = ball.x - speed*cos;
             ball.y = ball.y - speed*sin;
+
+            for(var i=0;i<50;i++){
+                if(collisionDetection(ball, food[i])){
+                    food[i].getParent().removeChildByTag(food[i].getTag(), true);
+                }
+            }
+            //cc.log("Player X : " + ball.x + " Y : " + ball.y);
         }, REFRESH_TIME);
 
         //regular updates
@@ -89,10 +95,7 @@ var GameLayer = cc.Layer.extend({
         }, REGULAR_UPDATES_RATE);
 
         return true;
-
-
-    }
-
+    },
 
 });
 
@@ -104,6 +107,21 @@ var GameScene = cc.Scene.extend({
         layer.init();
     }
 });
+
+function collisionDetection(player, sprite2) {
+    var radius1 = player.getContentSize().height / 2;
+    var radius2 = sprite2.getContentSize().height / 2;
+
+    var distanceX = sprite2.getPositionX() - player.getPositionX();
+    var distanceY = sprite2.getPositionY() - player.getPositionY();
+    var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+    if (distance < (radius1 + radius2)) {
+        return true;
+    }
+}
+
+
 
 function calculateAngle(soucePoint,targetPoint,angle){//ball - source, mouse - targetpoint
     var tempAngle = (Math.atan2(targetPoint.y-soucePoint.y,targetPoint.x-soucePoint.x));
