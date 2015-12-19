@@ -80,17 +80,17 @@ var GameLayer = cc.Layer.extend({
             var isUp = true;
             var isDown = true;
             angle = calculateAngle(mousePos,ball,angle);
-            speed = 10*calculateSpeed(mousePos,ball,speed,size);
+            speed = calculateSpeed(mousePos,ball,speed,size);
             var sin = Math.sin(angle);
             var cos = Math.cos(angle);
 
-            if(map.getPositionX()>size.width/2) isLeft = false;
+            if(map.getPositionX()>size.width/2-10) isLeft = false;
             else isLeft = true;
-            if(map.getPositionX()<size.width/2-map.width) isRight = false;
+            if(map.getPositionX()<size.width/2-map.width+10) isRight = false;
             else isRight = true;
-            if(map.getPositionY()<size.height/2-map.height) isDown = false;
+            if(map.getPositionY()<size.height/2-map.height+10) isDown = false;
             else isDown = true;
-            if(map.getPositionY()>size.height/2) isUp = false;
+            if(map.getPositionY()>size.height/2-10) isUp = false;
             else isUp = true;
 
             if(cos<0){
