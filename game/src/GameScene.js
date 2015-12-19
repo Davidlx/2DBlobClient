@@ -251,8 +251,7 @@ function screen2map(scrX, scrY){
 }
 
 function getUserPosition(){
-    screen2map(size.width/2, size.height/2);
-    return (x,y);
+    return screen2map(size.width/2, size.height/2);
 }
 
 function getUNIXTimestamp(){
