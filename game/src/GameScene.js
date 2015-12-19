@@ -4,7 +4,7 @@ var socket = io(url);
 var index = 0;
 var GameLayer = cc.Layer.extend({
 
-    ctor: function(){
+        ctor: function(){
         this._super();
 
         socket.emit('user_name','test');
@@ -48,24 +48,23 @@ var GameLayer = cc.Layer.extend({
             if(random_num == 3) food[food_index] = new cc.Sprite(res.food_purple_png);
             food[food_index].setAnchorPoint(0.5, 0.5);
             food[food_index].setPosition(food_pos_x, food_pos_y);
+            food[food_index].setTag(food_index);
             this.addChild(food[food_index],0);
+            //cc.log("Food " + food_index + " location : " + food[food_index].getPositionX() + " " + food[food_index].getPositionY());
             food_index++;
         }
 
         // demo ended
-
-
         var ball = new cc.Sprite(res.ball_png);
         ball.setAnchorPoint(0.5, 0.5);
         ball.setPosition(size.width/2, size.height/2);
+
         this.addChild(ball,0);
-
-
         var REFRESH_TIME = 10;
         var REGULAR_UPDATES_RATE = 100;
         var speed = 0;
         var angle = 0;
-        var size = 1;
+        var ballsize = 1;
         var mousePos;
         cc.eventManager.addListener({
             event: cc.EventListener.MOUSE,
@@ -77,12 +76,21 @@ var GameLayer = cc.Layer.extend({
 
         window.setInterval(function(){
 
-            angle = calculateAngle(ball,mousePos,angle);
-            speed = calculateSpeed(ball,mousePos,speed,size);
+            angle = calculateAngle(mousePos,ball,angle);
+            speed = calculateSpeed(mousePos,ball,speed,size);
             var sin = Math.sin(angle);
             var cos = Math.cos(angle);
-            ball.x = ball.x + speed*cos;
-            ball.y = ball.y + speed*sin;
+            ball.x = ball.x - speed*cos;
+            ball.y = ball.y - speed*sin;
+
+            for(var i=0;i<50;i++){
+                if(collisionDetection(ball, food[i])){
+                    ballsize = calculatePlayerSize(ball, food[i]);
+                    ball.setScale(ballsize/ball.getContentSize().height);
+                    food[i].getParent().removeChildByTag(food[i].getTag(), true);
+                }
+            }
+            //cc.log("Player X : " + ball.x + " Y : " + ball.y);
         }, REFRESH_TIME);
 
         //regular updates
@@ -91,10 +99,37 @@ var GameLayer = cc.Layer.extend({
         }, REGULAR_UPDATES_RATE);
 
         return true;
+    },
 
+    /*
+    addFood: function(){
+        for(var i=0;i<50;i++){
+            var food_pos_x = Math.round(Math.random()*size.width);
+            var food_pos_y = Math.round(Math.random()*size.height);
 
+            var random_num = Math.round(Math.random()*3);
+            if(random_num == 0) oneFood = new cc.Sprite(res.food_red_png);
+            if(random_num == 1) oneFood = new cc.Sprite(res.food_blue_png);
+            if(random_num == 2) oneFood = new cc.Sprite(res.food_green_png);
+            if(random_num == 3) oneFood = new cc.Sprite(res.food_purple_png);
+            this.food.push(oneFood);
+            oneFood.setAnchorPoint(0.5, 0.5);
+            oneFood.setPosition(food_pos_x, food_pos_y);
+            oneFood.setTag(food_index);
+            this.addChild(oneFood,0);
+            //cc.log("Food " + food_index + " location : " + food[food_index].getPositionX() + " " + food[food_index].getPositionY());
+            food_index++;
+        }
+    },
+
+    deleteFood: function(sprite){
+        var i = this.food.indexOf(sprite);
+        if(i > -1) {
+            this.food.splice(i,1);        
+        }
+        this.food[i].getParent().removeChildByTag(food[i].getTag(), true);
     }
-
+    */
 
 });
 
@@ -106,6 +141,22 @@ var GameScene = cc.Scene.extend({
         layer.init();
     }
 });
+
+
+function collisionDetection(player, sprite2) {
+    var radius1 = player.getContentSize().height / 2;
+    var radius2 = sprite2.getContentSize().height / 2;
+
+    var distanceX = sprite2.getPositionX() - player.getPositionX();
+    var distanceY = sprite2.getPositionY() - player.getPositionY();
+    var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+    if (distance < (radius1 + radius2)) {
+        return true;
+    }
+}
+
+
 
 function calculateAngle(soucePoint,targetPoint,angle){//ball - source, mouse - targetpoint
     var tempAngle = (Math.atan2(targetPoint.y-soucePoint.y,targetPoint.x-soucePoint.x));
@@ -121,8 +172,8 @@ function calculateSpeed(soucePoint,targetPoint,speed,size){//ball - source, mous
     var tempSpeed = calculateSpeedAlgorithm(soucePoint,targetPoint,size);
     if (tempSpeed != speed) {
         //upload server - angle changed
+        //console.log("speed changed");
         socket.emit('update_user_speed',index,soucePoint.x,soucePoint.y,tempSpeed,getUNIXTimestamp());
-        console.log("speed changed");
     }
     return tempSpeed;
 }
@@ -135,6 +186,13 @@ function calculateSpeedAlgorithm(soucePoint,targetPoint,size){
     return 1;
 }
 
+
+function calculatePlayerSize(player,sprite){
+    var size = player.getContentSize().height + sprite.getContentSize().height;
+    return size;
+}
+
+
 function updateClientStatus(ball,mousePos,speed,angle){}
 
 function getUNIXTimestamp(){
@@ -144,4 +202,3 @@ function getUNIXTimestamp(){
 socket.on('user_index',function(newIndex){
     index = newIndex;
 })
-
