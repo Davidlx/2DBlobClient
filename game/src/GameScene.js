@@ -238,6 +238,23 @@ function calculatePlayerSize(player,sprite){
 
 function updateClientStatus(ball,mousePos,speed,angle){}
 
+function map2screen(mapX, mapY){
+    var x = mapX + map.getPositionX();
+    var y = mapY + map.getPositionY();
+    return (x,y);
+}
+
+function screen2map(scrX, scrY){
+    var x = scrX - map.getPositionX();
+    var y = scrY - map.getPositionY();
+    return (x,y);
+}
+
+function getUserPosition(){
+    screen2map(size.width/2, size.height/2);
+    return (x,y);
+}
+
 function getUNIXTimestamp(){
     return Math.floor(Date.now());//change the server accodingly.
 }
