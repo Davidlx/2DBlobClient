@@ -12,7 +12,9 @@ var res = {
     food_red_png : "res/food_red.png",
     food_blue_png : "res/food_blue.png",
     food_green_png : "res/food_green.png",
-    food_purple_png : "res/food_purple.png"
+    food_purple_png : "res/food_purple.png",
+    map_tmx : "res/map/map.tmx",
+    tile_png : "res/map/tile.png"
 };
 
 var g_resources = [];
