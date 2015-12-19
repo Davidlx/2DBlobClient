@@ -12,7 +12,11 @@ var res = {
     food_red_png : "res/food_red.png",
     food_blue_png : "res/food_blue.png",
     food_green_png : "res/food_green.png",
-    food_purple_png : "res/food_purple.png"
+    food_purple_png : "res/food_purple.png",
+    home_png: "res/home.png",
+    home_down_png: "res/home_down.png",
+    about_bg_png : "res/about_bg.png",
+    title_png:"res/title.png"
 };
 
 var g_resources = [];
