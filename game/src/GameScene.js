@@ -53,11 +53,17 @@ var GameLayer = cc.Layer.extend({
         }
 
         // demo ended
+
         var ball = new cc.Sprite(res.ball_png);
         ball.setAnchorPoint(0.5, 0.5);
-        var userSpawnPosX = size.width/2;
-        var userSpawnPosY = size.height/2;
-        ball.setPosition(userSpawnPosX, userSpawnPosY);
+        var map_userSpawnPosX = Math.round(Math.random()*map.width);
+        var map_userSpawnPosY = Math.round(Math.random()*map.height);
+        // set map position
+        var scr_userSpawnPosX = size.width/2 - map_userSpawnPosX;
+        var scr_userSpawnPosY = size.height/2 - map_userSpawnPosY;
+
+        ball.setPosition(size.width/2, size.height/2);
+        map.setPosition(scr_userSpawnPosX, scr_userSpawnPosY);
 
         this.addChild(ball,0);
         var REFRESH_TIME = 10;
@@ -94,38 +100,21 @@ var GameLayer = cc.Layer.extend({
             else isUp = true;
 
             if(cos<0){
+                if(isRight) map.setPositionX(map.getPositionX() + speed * cos);
                 if(sin<0){
-                    if(isRight) map.setPositionX(map.getPositionX() + speed * cos);
                     if(isDown) map.setPositionY(map.getPositionY() + speed * sin);
                 }else{
-                    if(isRight) map.setPositionX(map.getPositionX() + speed * cos);
                     if(isUp) map.setPositionY(map.getPositionY() + speed * sin);
                 }
             }else {
+                if(isLeft) map.setPositionX(map.getPositionX() + speed * cos);
                 if(sin<0){
-                    if(isLeft) map.setPositionX(map.getPositionX() + speed * cos);
                     if(isDown) map.setPositionY(map.getPositionY() + speed * sin);
                 }else{
-                    if(isLeft) map.setPositionX(map.getPositionX() + speed * cos);
                     if(isUp) map.setPositionY(map.getPositionY() + speed * sin);
                 }
             }
-            //}else if(sin>0){
-            //    if(!isDown) map.setPositionY(map.getPositionY() + speed * sin);
-            //    else{
-            //        map.setPositionX(map.getPositionX() + speed * cos);
-            //        map.setPositionY(map.getPositionY() + speed * sin);
-            //    }
-            //}else if(sin<0){
-            //    if(!isUp) map.setPositionY(map.getPositionY() + speed * sin);
-            //    else{
-            //        map.setPositionX(map.getPositionX() + speed * cos);
-            //        map.setPositionY(map.getPositionY() + speed * sin);
-            //    }
-            //}
 
-            //map.setPositionX(map.getPositionX() + speed * cos);
-            //map.setPositionY(map.getPositionY() + speed * sin);
             for(var i=0;i<50;i++){
                 if(collisionDetection(ball, food[i])){
                     ballsize = calculatePlayerSize(ball, food[i]);
