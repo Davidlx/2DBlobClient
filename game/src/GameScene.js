@@ -7,6 +7,7 @@ var map;
 var ballSize;
 var score;
 var food;
+var userName;
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
@@ -19,7 +20,6 @@ var GameLayer = cc.Layer.extend({
         size = cc.director.getWinSize();
         map = new cc.TMXTiledMap(res.map_tmx);
         this.addChild(map,0);
-
 
 
         var MAX_FOOD_NUM = 100;
@@ -58,9 +58,13 @@ var GameLayer = cc.Layer.extend({
 
         ball.setPosition(size.width/2, size.height/2);
         map.setPosition(scr_userSpawnPosX, scr_userSpawnPosY);
-
-
         this.addChild(ball,0);
+
+        userName = new cc.LabelTTF("test", "Arial");
+        userName.setFontSize(ball.getBoundingBox()/2);
+        userName.setPosition(cc.p(ball.getPositionX(), ball.getPositionY()));
+        userName.setColor(cc.color(0,0,0));
+        this.addChild(userName,0);
 
         var REFRESH_TIME = 10;
         var REGULAR_UPDATES_RATE = 100;
@@ -114,15 +118,20 @@ var GameLayer = cc.Layer.extend({
                 }
             }
 
-
+            var sprite_action = cc.ScaleBy.create(1, 1.01, 1.01);
             for(var i=0;i<50;i++){
                 var currentBallScale = ball.getScale();
                 if(collisionDetection(ball, food[i])){
                     //ballsize = calculatePlayerSize(ball, food[i]);
+
                     score++;
                     ball.setScale(calculatePlayerScale(ball));//ballsize/ball.getContentSize().height);
                     //console.log("Ball scale: "+ball.getScale());
                     console.log("Score: "+score);
+
+                    //ball.setScale(ball.getScale()+0.01);
+                    ball.runAction(sprite_action);
+
                     map.removeChild(food[i], true);
                     addFood(i);
                 }
