@@ -16,6 +16,11 @@ var HelloWorldLayer = cc.Layer.extend({
         bg.x = size.width / 2;
         bg.y = size.height / 2;
         this.addChild(bg);
+        
+        var title = new cc.Sprite(res.title_png);
+        title.x = size.width / 2+20;
+        title.y = size.height / 2+130;
+        this.addChild(title);
 
         //add start sprite
         var startMenuItem = new cc.MenuItemImage(
