@@ -4,6 +4,9 @@ var socket = io(url);
 var index = 0;
 var size;
 var map;
+var ballSize;
+var score;
+var food;
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
@@ -20,8 +23,7 @@ var GameLayer = cc.Layer.extend({
 
 
         var MAX_FOOD_NUM = 100;
-        var food = new Array(MAX_FOOD_NUM);
-        var food_index = 0;
+        food = new Array(MAX_FOOD_NUM);
 
         /* real code when server is online
         io.emit('place_food',function(food_pos_x, food_pos_y){
@@ -40,20 +42,7 @@ var GameLayer = cc.Layer.extend({
 
         //The following is for demo
         for(var i=0;i<50;i++){
-            var food_pos_x = Math.round(Math.random()*map.width);
-            var food_pos_y = Math.round(Math.random()*map.height);
-
-            var random_num = Math.round(Math.random()*3);
-            if(random_num == 0) food[food_index] = new cc.Sprite(res.food_red_png);
-            if(random_num == 1) food[food_index] = new cc.Sprite(res.food_blue_png);
-            if(random_num == 2) food[food_index] = new cc.Sprite(res.food_green_png);
-            if(random_num == 3) food[food_index] = new cc.Sprite(res.food_purple_png);
-            food[food_index].setAnchorPoint(0.5, 0.5);
-            food[food_index].setPosition(food_pos_x, food_pos_y);
-            food[food_index].setTag(food_index);
-            map.addChild(food[food_index],0);
-            //cc.log("Food " + food_index + " location : " + food[food_index].getPositionX() + " " + food[food_index].getPositionY());
-            food_index++;
+            addFood(i);
         }
 
         // demo ended
@@ -77,7 +66,9 @@ var GameLayer = cc.Layer.extend({
         var REGULAR_UPDATES_RATE = 100;
         var speed = 0;
         var angle = 0;
-        var ballsize = 1;
+        score = 0;
+        ballSize = ball.getContentSize().width;
+        ball.setScale(0.03);
         var mousePos;
         cc.eventManager.addListener({
             event: cc.EventListener.MOUSE,
@@ -125,12 +116,17 @@ var GameLayer = cc.Layer.extend({
 
 
             for(var i=0;i<50;i++){
+                var currentBallScale = ball.getScale();
                 if(collisionDetection(ball, food[i])){
-                    ballsize = calculatePlayerSize(ball, food[i]);
-                    ball.setScale(ball.getScale()+0.01);//ballsize/ball.getContentSize().height);
+                    //ballsize = calculatePlayerSize(ball, food[i]);
+                    score++;
+                    ball.setScale(calculatePlayerScale(ball));//ballsize/ball.getContentSize().height);
+                    //console.log("Ball scale: "+ball.getScale());
+                    console.log("Score: "+score);
                     map.removeChild(food[i], true);
+                    addFood(i);
                 }
-                console.log(collisionDetection(ball, food[i]));
+                //console.log(collisionDetection(ball, food[i]));
             }
             //cc.log("Player X : " + ball.x + " Y : " + ball.y);
         }, REFRESH_TIME);
@@ -183,11 +179,25 @@ var GameScene = cc.Scene.extend({
         layer.init();
     }
 });
+function addFood(food_index){
+    var food_pos_x = Math.round(Math.random()*map.width);
+    var food_pos_y = Math.round(Math.random()*map.height);
 
+    var random_num = Math.round(Math.random()*3);
+    if(random_num == 0) food[food_index] = new cc.Sprite(res.food_red_png);
+    if(random_num == 1) food[food_index] = new cc.Sprite(res.food_blue_png);
+    if(random_num == 2) food[food_index] = new cc.Sprite(res.food_green_png);
+    if(random_num == 3) food[food_index] = new cc.Sprite(res.food_purple_png);
+    food[food_index].setAnchorPoint(0.5, 0.5);
+    food[food_index].setPosition(food_pos_x, food_pos_y);
+    food[food_index].setTag(food_index);
+    map.addChild(food[food_index],0);
+}
 
 function collisionDetection(player, sprite2) {
     size = cc.director.getWinSize();
-    var radius1 = player.getScale()*10;
+    //console.log("Ball size: "+ballSize);
+    var radius1 = player.getScale()*ballSize/2;
     //console.log("player.getScale(): "+radius1);
     var radius2 = sprite2.getScale();
     //console.log("player.getContentSize(): "+radius1+" sprite2.getContentSize(): "+radius2);
@@ -244,9 +254,16 @@ function calculateSpeedAlgorithm(soucePoint,targetPoint,size){
 }
 
 
-function calculatePlayerSize(player,sprite){
-    var size = player.getContentSize().height + sprite.getContentSize().height;
-    return size;
+function calculatePlayerScale(player){
+    var scale;
+    if(score<100){
+        scale = player.getScale() + 0.005;
+    }
+    else{
+        scale = player.getScale();
+    }
+    //var scale = 0.03*(Math.log(score+1)+1);
+    return scale;
 }
 
 
