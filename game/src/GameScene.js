@@ -2,6 +2,8 @@ var url = window.location.href;
 console.log(url);
 var socket = io(url);
 var index = 0;
+var size;
+var map;
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
@@ -10,8 +12,8 @@ var GameLayer = cc.Layer.extend({
         socket.emit('user_name','test');
 
         //cc.log("Game init");
-        var size = cc.director.getWinSize();
-        var map = new cc.TMXTiledMap(res.map_tmx);
+        size = cc.director.getWinSize();
+        map = new cc.TMXTiledMap(res.map_tmx);
         this.addChild(map,0);
 
 
@@ -86,7 +88,7 @@ var GameLayer = cc.Layer.extend({
             var isUp = true;
             var isDown = true;
             angle = calculateAngle(mousePos,ball,angle);
-            speed = calculateSpeed(mousePos,ball,speed,size);
+            speed = 3*calculateSpeed(mousePos,ball,speed,size);
             var sin = Math.sin(angle);
             var cos = Math.cos(angle);
 
@@ -118,9 +120,10 @@ var GameLayer = cc.Layer.extend({
             for(var i=0;i<50;i++){
                 if(collisionDetection(ball, food[i])){
                     ballsize = calculatePlayerSize(ball, food[i]);
-                    ball.setScale(ballsize/ball.getContentSize().height);
-                    food[i].getParent().removeChildByTag(food[i].getTag(), true);
+                    ball.setScale(ball.getScale()+0.01);//ballsize/ball.getContentSize().height);
+                    map.removeChild(food[i], true);
                 }
+                console.log(collisionDetection(ball, food[i]));
             }
             //cc.log("Player X : " + ball.x + " Y : " + ball.y);
         }, REFRESH_TIME);
@@ -176,15 +179,30 @@ var GameScene = cc.Scene.extend({
 
 
 function collisionDetection(player, sprite2) {
-    var radius1 = player.getContentSize().height / 2;
-    var radius2 = sprite2.getContentSize().height / 2;
+    size = cc.director.getWinSize();
+    var radius1 = player.getScale()*10;
+    //console.log("player.getScale(): "+radius1);
+    var radius2 = sprite2.getScale();
+    //console.log("player.getContentSize(): "+radius1+" sprite2.getContentSize(): "+radius2);
+    //var mapCo_Player = screen2map(size.width/2,size.height/2);
+    var playerX = size.width/2 - map.getPositionX();//mapCo_Player[0];
+    var playerY = size.height/2- map.getPositionY();//mapCo_Player[1];
+    //console.log("player position: "+playerX+ " "+playerY);
+    //console.log("map position: "+ map.getPositionX()+ " "+ map.getPositionY());
+    //var mapCo_sprite2 = screen2map(sprite2.getPositionX(),sprite2.getPositionY());
+    var sprite2X = sprite2.getPositionX();
+    var sprite2Y = sprite2.getPositionY();
+    //console.log("food position: "+sprite2X+ " "+sprite2Y);
+    var distanceX = sprite2X - playerX;
+    var distanceY = sprite2Y - playerY;
 
-    var distanceX = sprite2.getPositionX() - player.getPositionX();
-    var distanceY = sprite2.getPositionY() - player.getPositionY();
     var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 
     if (distance < (radius1 + radius2)) {
         return true;
+    }
+    else{
+        return false;
     }
 }
 
@@ -230,13 +248,13 @@ function updateClientStatus(ball,mousePos,speed,angle){}
 function map2screen(mapX, mapY){
     var x = mapX + map.getPositionX();
     var y = mapY + map.getPositionY();
-    return (x,y);
+    return [x,y];
 }
 
 function screen2map(scrX, scrY){
     var x = scrX - map.getPositionX();
     var y = scrY - map.getPositionY();
-    return (x,y);
+    return [x,y];
 }
 
 function getUserPosition(){
