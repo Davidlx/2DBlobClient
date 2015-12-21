@@ -58,12 +58,14 @@ var GameLayer = cc.Layer.extend({
 
         ball.setPosition(size.width/2, size.height/2);
         map.setPosition(scr_userSpawnPosX, scr_userSpawnPosY);
+        ballSize = ball.getContentSize().width;
+        ball.setScale(0.03);
         this.addChild(ball,0);
 
         userName = new cc.LabelTTF("test", "Arial");
         userName.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
         userName.setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-        userName.setFontSize(ball.getBoundingBox().height/50);
+        userName.setFontSize(ballSize/2 * ball.getScale());
         userName.setPosition(cc.p(ball.getPositionX(), ball.getPositionY()));
         userName.setColor(cc.color(0,0,0));
         this.addChild(userName,0);
@@ -73,8 +75,6 @@ var GameLayer = cc.Layer.extend({
         var speed = 0;
         var angle = 0;
         score = 0;
-        ballSize = ball.getContentSize().width;
-        ball.setScale(0.03);
         var mousePos;
         cc.eventManager.addListener({
             event: cc.EventListener.MOUSE,
@@ -120,7 +120,6 @@ var GameLayer = cc.Layer.extend({
                 }
             }
 
-            var sprite_action = cc.ScaleBy.create(1, 1.01, 1.01);
             for(var i=0;i<50;i++){
                 var currentBallScale = ball.getScale();
                 if(collisionDetection(ball, food[i])){
@@ -130,10 +129,12 @@ var GameLayer = cc.Layer.extend({
                     ball.setScale(calculatePlayerScale(ball));//ballsize/ball.getContentSize().height);
                     //console.log("Ball scale: "+ball.getScale());
                     console.log("Score: "+score);
-
                     //ball.setScale(ball.getScale()+0.01);
-                    ball.runAction(sprite_action);
-                    userName.setFontSize(userName.getFontSize()*1.01);
+                    //ball.runAction(sprite_action);
+                    //cc.log("ball size : " + ball.getContentSize().height * calculatePlayerScale(ball));
+                    userName.setFontSize((ballSize/2) * calculatePlayerScale(ball));
+                    cc.log("font size : "+userName.getFontSize()*calculatePlayerScale(userName));
+
                     map.removeChild(food[i], true);
                     addFood(i);
                 }
@@ -271,7 +272,7 @@ function calculatePlayerScale(player){
         scale = player.getScale() + 0.005;
     }
     else{
-        scale = player.getScale();
+        scale = player.getScale() + 0.0005;
     }
     //var scale = 0.03*(Math.log(score+1)+1);
     return scale;
