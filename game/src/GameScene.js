@@ -12,9 +12,11 @@ var GameLayer = cc.Layer.extend({
         socket.emit('user_name','test');
 
         //cc.log("Game init");
+
         size = cc.director.getWinSize();
         map = new cc.TMXTiledMap(res.map_tmx);
         this.addChild(map,0);
+
 
 
         var MAX_FOOD_NUM = 100;
@@ -58,6 +60,7 @@ var GameLayer = cc.Layer.extend({
 
         var ball = new cc.Sprite(res.ball_png);
         ball.setAnchorPoint(0.5, 0.5);
+
         var map_userSpawnPosX = Math.round(Math.random()*map.width);
         var map_userSpawnPosY = Math.round(Math.random()*map.height);
         // set map position
@@ -67,7 +70,9 @@ var GameLayer = cc.Layer.extend({
         ball.setPosition(size.width/2, size.height/2);
         map.setPosition(scr_userSpawnPosX, scr_userSpawnPosY);
 
+
         this.addChild(ball,0);
+
         var REFRESH_TIME = 10;
         var REGULAR_UPDATES_RATE = 100;
         var speed = 0;
@@ -91,6 +96,7 @@ var GameLayer = cc.Layer.extend({
             speed = 3*calculateSpeed(mousePos,ball,speed,size);
             var sin = Math.sin(angle);
             var cos = Math.cos(angle);
+
 
             if(map.getPositionX()>size.width/2-10) isLeft = false;
             else isLeft = true;
@@ -116,6 +122,7 @@ var GameLayer = cc.Layer.extend({
                     if(isUp) map.setPositionY(map.getPositionY() + speed * sin);
                 }
             }
+
 
             for(var i=0;i<50;i++){
                 if(collisionDetection(ball, food[i])){
