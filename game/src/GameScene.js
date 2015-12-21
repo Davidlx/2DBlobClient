@@ -61,7 +61,9 @@ var GameLayer = cc.Layer.extend({
         this.addChild(ball,0);
 
         userName = new cc.LabelTTF("test", "Arial");
-        userName.setFontSize(ball.getBoundingBox()/2);
+        userName.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+        userName.setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+        userName.setFontSize(ball.getBoundingBox().height/50);
         userName.setPosition(cc.p(ball.getPositionX(), ball.getPositionY()));
         userName.setColor(cc.color(0,0,0));
         this.addChild(userName,0);
@@ -131,7 +133,7 @@ var GameLayer = cc.Layer.extend({
 
                     //ball.setScale(ball.getScale()+0.01);
                     ball.runAction(sprite_action);
-
+                    userName.setFontSize(userName.getFontSize()*1.01);
                     map.removeChild(food[i], true);
                     addFood(i);
                 }
