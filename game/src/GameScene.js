@@ -9,6 +9,8 @@ var score;
 var food;
 var userName;
 var mousePos;
+var map_userSpawnPosX;
+var map_userSpawnPosY;
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
@@ -67,8 +69,14 @@ var GameLayer = cc.Layer.extend({
         },2000);
 
 //
-        var map_userSpawnPosX = Math.round(Math.random()*map.width);
-        var map_userSpawnPosY = Math.round(Math.random()*map.height);
+        socket.on('user_initial_position', function(x,y){
+           console.log("user_initial_position: "+ x+", "+y);
+            map_userSpawnPosX = x;
+            map_userSpawnPosY = y;
+
+        });
+        //var map_userSpawnPosX = //Math.round(Math.random()*map.width);
+        //var map_userSpawnPosY = Math.round(Math.random()*map.height);
         // set map position
         var scr_userSpawnPosX = size.width/2 - map_userSpawnPosX;
         var scr_userSpawnPosY = size.height/2 - map_userSpawnPosY;
@@ -232,8 +240,8 @@ function otherUsersMove(ball, angle, speed){
     if(ball.y>map.height) isUp = false;
     else isUp = true;
     console.log("X: "+ball.x);
-
-    if(cos<0){
+    console.log("cos: "+cos);
+    if(cos>0){
         if(isRight) ball.x+= speed * cos;
         if(sin<0){
             if(isDown) ball.y+= speed * sin;
@@ -311,7 +319,7 @@ function calculateSpeed(sourcePoint,targetPoint,speed,size){//ball - source, mou
     if (tempSpeed != speed) {
         //upload server - angle changed
         //console.log("speed changed");
-        socket.emit('update_user_speed',index,sourcePoint.x,sourcePoint.y,tempSpeed,getUNIXTimestamp());
+        socket.emit('update_user_speed',index,targetPoint.x,targetPoint.y,tempSpeed,getUNIXTimestamp());
     }
     return tempSpeed;
 }
