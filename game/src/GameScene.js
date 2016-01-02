@@ -8,6 +8,7 @@ var ballSize;
 var score;
 var food;
 var userName;
+var mousePos;
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
@@ -49,7 +50,23 @@ var GameLayer = cc.Layer.extend({
 
         var ball = new cc.Sprite(res.ball_png);
         ball.setAnchorPoint(0.5, 0.5);
+//
+        var users = new Array(99);
+        var usersNum = 2;
+        users[0] = new cc.Sprite(res.ball_png);
+        users[0].setScale(0.1);
+        users[0].setAnchorPoint(0.5, 0.5);
+        users[0].setPosition(800,800);
 
+
+        map.addChild(users[0],0);
+
+        window.setInterval(function(){
+            users[0].angle = (Math.random()-0.5)*6;
+
+        },2000);
+
+//
         var map_userSpawnPosX = Math.round(Math.random()*map.width);
         var map_userSpawnPosY = Math.round(Math.random()*map.height);
         // set map position
@@ -75,7 +92,6 @@ var GameLayer = cc.Layer.extend({
         var speed = 0;
         var angle = 0;
         score = 0;
-        var mousePos;
         cc.eventManager.addListener({
             event: cc.EventListener.MOUSE,
             onMouseMove: function (event) {
@@ -85,40 +101,14 @@ var GameLayer = cc.Layer.extend({
         },ball);
 
         window.setInterval(function(){
-            var isLeft = true;
-            var isRight = true;
-            var isUp = true;
-            var isDown = true;
-            angle = calculateAngle(mousePos,ball,angle);
-            speed = 3*calculateSpeed(mousePos,ball,speed,size);
-            var sin = Math.sin(angle);
-            var cos = Math.cos(angle);
+            ball.angle = calculateAngle(mousePos,ball,angle);
+            ball.speed = 3*calculateSpeed(mousePos,ball,speed,size);
+            move(ball, ball.angle, ball.speed);
+            console.log("angle: "+users[0].angle);
+
+            otherUsersMove(users[0], 2, 1);
 
 
-            if(map.getPositionX()>size.width/2-10) isLeft = false;
-            else isLeft = true;
-            if(map.getPositionX()<size.width/2-map.width+10) isRight = false;
-            else isRight = true;
-            if(map.getPositionY()<size.height/2-map.height+10) isDown = false;
-            else isDown = true;
-            if(map.getPositionY()>size.height/2-10) isUp = false;
-            else isUp = true;
-
-            if(cos<0){
-                if(isRight) map.setPositionX(map.getPositionX() + speed * cos);
-                if(sin<0){
-                    if(isDown) map.setPositionY(map.getPositionY() + speed * sin);
-                }else{
-                    if(isUp) map.setPositionY(map.getPositionY() + speed * sin);
-                }
-            }else {
-                if(isLeft) map.setPositionX(map.getPositionX() + speed * cos);
-                if(sin<0){
-                    if(isDown) map.setPositionY(map.getPositionY() + speed * sin);
-                }else{
-                    if(isUp) map.setPositionY(map.getPositionY() + speed * sin);
-                }
-            }
 
             for(var i=0;i<50;i++){
                 var currentBallScale = ball.getScale();
@@ -191,6 +181,75 @@ var GameScene = cc.Scene.extend({
         layer.init();
     }
 });
+
+function move(ball, angle, speed){
+    var isLeft = true;
+    var isRight = true;
+    var isUp = true;
+    var isDown = true;
+    var sin = Math.sin(angle);
+    var cos = Math.cos(angle);
+
+    if(map.getPositionX()>size.width/2-10) isLeft = false;
+    else isLeft = true;
+    if(map.getPositionX()<size.width/2-map.width+10) isRight = false;
+    else isRight = true;
+    if(map.getPositionY()<size.height/2-map.height+10) isDown = false;
+    else isDown = true;
+    if(map.getPositionY()>size.height/2-10) isUp = false;
+    else isUp = true;
+
+    if(cos<0){
+        if(isRight) map.setPositionX(map.getPositionX() + speed * cos);
+        if(sin<0){
+            if(isDown) map.setPositionY(map.getPositionY() + speed * sin);
+        }else{
+            if(isUp) map.setPositionY(map.getPositionY() + speed * sin);
+        }
+    }else {
+        if(isLeft) map.setPositionX(map.getPositionX() + speed * cos);
+        if(sin<0){
+            if(isDown) map.setPositionY(map.getPositionY() + speed * sin);
+        }else{
+            if(isUp) map.setPositionY(map.getPositionY() + speed * sin);
+        }
+    }
+}
+
+function otherUsersMove(ball, angle, speed){
+    var isLeft = true;
+    var isRight = true;
+    var isUp = true;
+    var isDown = true;
+    var sin = Math.sin(angle);
+    var cos = Math.cos(angle);
+    if(ball.x<0) isLeft = false;
+    else isLeft = true;
+    if(ball.x>map.width) isRight = false;
+    else isRight = true;
+    if(ball.y<0) isDown = false;
+    else isDown = true;
+    if(ball.y>map.height) isUp = false;
+    else isUp = true;
+    console.log("X: "+ball.x);
+
+    if(cos<0){
+        if(isRight) ball.x+= speed * cos;
+        if(sin<0){
+            if(isDown) ball.y+= speed * sin;
+        }else{
+            if(isUp) ball.y += speed * sin;
+        }
+    }else {
+        if(isLeft) ball.x += speed * cos;
+        if(sin<0){
+            if(isDown) ball.y += speed * sin;
+        }else{
+            if(isUp) ball.y += speed * sin;
+        }
+    }
+}
+
 function addFood(food_index){
     var food_pos_x = Math.round(Math.random()*map.width);
     var food_pos_y = Math.round(Math.random()*map.height);
@@ -237,22 +296,22 @@ function collisionDetection(player, sprite2) {
 
 
 
-function calculateAngle(soucePoint,targetPoint,angle){//ball - source, mouse - targetpoint
-    var tempAngle = (Math.atan2(targetPoint.y-soucePoint.y,targetPoint.x-soucePoint.x));
+function calculateAngle(sourcePoint,targetPoint,angle){//ball - source, mouse - targetpoint
+    var tempAngle = (Math.atan2(targetPoint.y-sourcePoint.y,targetPoint.x-sourcePoint.x));
     if (tempAngle != angle) {
         //upload server - angle changed
         //console.log("angle changed");
-        socket.emit('update_user_direction',index,soucePoint.x,soucePoint.y,tempAngle,getUNIXTimestamp());
+        socket.emit('update_user_direction',index,sourcePoint.x,sourcePoint.y,tempAngle,getUNIXTimestamp());
     }
     return tempAngle;
 }
 
-function calculateSpeed(soucePoint,targetPoint,speed,size){//ball - source, mouse - targetpoint
-    var tempSpeed = calculateSpeedAlgorithm(soucePoint,targetPoint,size);
+function calculateSpeed(sourcePoint,targetPoint,speed,size){//ball - source, mouse - targetpoint
+    var tempSpeed = calculateSpeedAlgorithm(sourcePoint,targetPoint,size);
     if (tempSpeed != speed) {
         //upload server - angle changed
         //console.log("speed changed");
-        socket.emit('update_user_speed',index,soucePoint.x,soucePoint.y,tempSpeed,getUNIXTimestamp());
+        socket.emit('update_user_speed',index,sourcePoint.x,sourcePoint.y,tempSpeed,getUNIXTimestamp());
     }
     return tempSpeed;
 }
