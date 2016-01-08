@@ -9,145 +9,144 @@ var score;
 var food;
 var userName;
 var mousePos;
-var map_userSpawnPosX;
-var map_userSpawnPosY;
+var map_userSpawnPosX=0;
+var map_userSpawnPosY=0;
+
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
         this._super();
 
         socket.emit('user_name','test');
-
+        var gameLayer=this;
         //cc.log("Game init");
+        socket.on('user_initial_position',function(x,y){
+            map_userSpawnPosX=x;
+            map_userSpawnPosY=y;
+            console.log("CONNECTION SUCCESS");
+            size = cc.director.getWinSize();
 
-        size = cc.director.getWinSize();
-        map = new cc.TMXTiledMap(res.map_tmx);
-        this.addChild(map,0);
-
-
-        var MAX_FOOD_NUM = 100;
-        food = new Array(MAX_FOOD_NUM);
-
-        /* real code when server is online
-        io.emit('place_food',function(food_pos_x, food_pos_y){
-            var random_num = Math.round(Math.random()*3);
-            if(random_num == 0) food[food_index] = new cc.Sprite(res.food_red_png);
-            if(random_num == 1) food[food_index] = new cc.Sprite(res.food_blue_png);
-            if(random_num == 2) food[food_index] = new cc.Sprite(res.food_green_png);
-            if(random_num == 3) food[food_index] = new cc.Sprite(res.food_purple_png);
-            food[food_index].setAnchorPoint(0.5, 0.5);
-            food[food_index].setPosition(food_pos_x, food_pos_y);
-            this.addChild(food[food_index],0);
-            food_index++;
-        });
-        */
+            map = new cc.TMXTiledMap(res.map_tmx);
+            gameLayer.addChild(map, 0);
 
 
-        //The following is for demo
-        for(var i=0;i<50;i++){
-            addFood(i);
-        }
+            var MAX_FOOD_NUM = 100;
+            food = new Array(MAX_FOOD_NUM);
 
-        // demo ended
+            /* real code when server is online
+             io.emit('place_food',function(food_pos_x, food_pos_y){
+             var random_num = Math.round(Math.random()*3);
+             if(random_num == 0) food[food_index] = new cc.Sprite(res.food_red_png);
+             if(random_num == 1) food[food_index] = new cc.Sprite(res.food_blue_png);
+             if(random_num == 2) food[food_index] = new cc.Sprite(res.food_green_png);
+             if(random_num == 3) food[food_index] = new cc.Sprite(res.food_purple_png);
+             food[food_index].setAnchorPoint(0.5, 0.5);
+             food[food_index].setPosition(food_pos_x, food_pos_y);
+             this.addChild(food[food_index],0);
+             food_index++;
+             });
+             */
 
-        var ball = new cc.Sprite(res.ball_png);
-        ball.setAnchorPoint(0.5, 0.5);
-//
-        var users = new Array(99);
-        var usersNum = 2;
-        users[0] = new cc.Sprite(res.ball_png);
-        users[0].setScale(0.1);
-        users[0].setAnchorPoint(0.5, 0.5);
-        users[0].setPosition(800,800);
 
-
-        map.addChild(users[0],0);
-
-        window.setInterval(function(){
-            users[0].angle = (Math.random()-0.5)*6;
-
-        },2000);
-
-//
-        socket.on('user_initial_position', function(x,y){
-           console.log("user_initial_position: "+ x+", "+y);
-            map_userSpawnPosX = x;
-            map_userSpawnPosY = y;
-
-        });
-        //var map_userSpawnPosX = //Math.round(Math.random()*map.width);
-        //var map_userSpawnPosY = Math.round(Math.random()*map.height);
-        // set map position
-        var scr_userSpawnPosX = size.width/2 - map_userSpawnPosX;
-        var scr_userSpawnPosY = size.height/2 - map_userSpawnPosY;
-
-        ball.setPosition(size.width/2, size.height/2);
-        map.setPosition(scr_userSpawnPosX, scr_userSpawnPosY);
-        ballSize = ball.getContentSize().width;
-        ball.setScale(0.03);
-        this.addChild(ball,0);
-
-        userName = new cc.LabelTTF("test", "Arial");
-        userName.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-        userName.setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-        userName.setFontSize(ballSize/2 * ball.getScale());
-        userName.setPosition(cc.p(ball.getPositionX(), ball.getPositionY()));
-        userName.setColor(cc.color(0,0,0));
-        this.addChild(userName,0);
-
-        var REFRESH_TIME = 10;
-        var REGULAR_UPDATES_RATE = 100;
-        var speed = 0;
-        var angle = 0;
-        score = 0;
-        cc.eventManager.addListener({
-            event: cc.EventListener.MOUSE,
-            onMouseMove: function (event) {
-                //change when have a new map
-                mousePos = event.getLocation();
+            //The following is for demo
+            for (var i = 0; i < 50; i++) {
+                addFood(i);
             }
-        },ball);
 
-        window.setInterval(function(){
-            ball.angle = calculateAngle(mousePos,ball,angle);
-            ball.speed = 3*calculateSpeed(mousePos,ball,speed,size);
-            move(ball, ball.angle, ball.speed);
-            console.log("angle: "+users[0].angle);
+            // demo ended
 
-            otherUsersMove(users[0], 2, 1);
+            var ball = new cc.Sprite(res.ball_png);
+            ball.setAnchorPoint(0.5, 0.5);
+//
+            var users = new Array(99);
+            var usersNum = 2;
+            users[0] = new cc.Sprite(res.ball_png);
+            users[0].setScale(0.1);
+            users[0].setAnchorPoint(0.5, 0.5);
+            users[0].setPosition(800, 800);
 
 
+            map.addChild(users[0], 0);
 
-            for(var i=0;i<50;i++){
-                var currentBallScale = ball.getScale();
-                if(collisionDetection(ball, food[i])){
-                    //ballsize = calculatePlayerSize(ball, food[i]);
+            window.setInterval(function () {
+                users[0].angle = (Math.random() - 0.5) * 6;
 
-                    score++;
-                    ball.setScale(calculatePlayerScale(ball));//ballsize/ball.getContentSize().height);
-                    //console.log("Ball scale: "+ball.getScale());
-                    console.log("Score: "+score);
-                    //ball.setScale(ball.getScale()+0.01);
-                    //ball.runAction(sprite_action);
-                    //cc.log("ball size : " + ball.getContentSize().height * calculatePlayerScale(ball));
-                    userName.setFontSize((ballSize/2) * calculatePlayerScale(ball));
-                    cc.log("font size : "+userName.getFontSize()*calculatePlayerScale(userName));
+            }, 2000);
 
-                    map.removeChild(food[i], true);
-                    addFood(i);
+//
+
+            //var map_userSpawnPosX = //Math.round(Math.random()*map.width);
+            //var map_userSpawnPosY = Math.round(Math.random()*map.height);
+            // set map position
+            var scr_userSpawnPosX = size.width / 2 - map_userSpawnPosX;
+            var scr_userSpawnPosY = size.height / 2 - map_userSpawnPosY;
+
+            ball.setPosition(size.width / 2, size.height / 2);
+            map.setPosition(scr_userSpawnPosX, scr_userSpawnPosY);
+            ballSize = ball.getContentSize().width;
+            ball.setScale(0.03);
+            gameLayer.addChild(ball, 0);
+
+            userName = new cc.LabelTTF("test", "Arial");
+            userName.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+            userName.setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+            userName.setFontSize(ballSize / 2 * ball.getScale());
+            userName.setPosition(cc.p(ball.getPositionX(), ball.getPositionY()));
+            userName.setColor(cc.color(0, 0, 0));
+            gameLayer.addChild(userName, 0);
+
+            var REFRESH_TIME = 10;
+            var REGULAR_UPDATES_RATE = 100;
+            var speed = 0;
+            var angle = 0;
+            score = 0;
+            cc.eventManager.addListener({
+                event: cc.EventListener.MOUSE,
+                onMouseMove: function (event) {
+                    //change when have a new map
+                    mousePos = event.getLocation();
                 }
-                //console.log(collisionDetection(ball, food[i]));
-            }
-            //cc.log("Player X : " + ball.x + " Y : " + ball.y);
-        }, REFRESH_TIME);
+            }, ball);
 
-        //regular updates
-        window.setInterval(function(){
-            socket.emit('regular_updates',index,ball.x,ball.y,getUNIXTimestamp());
-        }, REGULAR_UPDATES_RATE);
+            window.setInterval(function () {
+                ball.angle = calculateAngle(mousePos, ball, angle);
+                ball.speed = 3 * calculateSpeed(mousePos, ball, speed, size);
+                move(ball, ball.angle, ball.speed);
 
-        return true;
-    },
+
+                otherUsersMove(users[0], 2, 1);
+
+
+                for (var i = 0; i < 50; i++) {
+                    var currentBallScale = ball.getScale();
+                    if (collisionDetection(ball, food[i])) {
+                        //ballsize = calculatePlayerSize(ball, food[i]);
+
+                        score++;
+                        ball.setScale(calculatePlayerScale(ball));//ballsize/ball.getContentSize().height);
+
+                        userName.setFontSize((ballSize / 2) * calculatePlayerScale(ball));
+                        cc.log("font size : " + userName.getFontSize() * calculatePlayerScale(userName));
+
+                        map.removeChild(food[i], true);
+                        addFood(i);
+                    }
+                    //console.log(collisionDetection(ball, food[i]));
+                }
+                //cc.log("Player X : " + ball.x + " Y : " + ball.y);
+            }, REFRESH_TIME);
+
+            //regular updates
+            window.setInterval(function () {
+                socket.emit('regular_updates', index, ball.x, ball.y, getUNIXTimestamp());
+            }, REGULAR_UPDATES_RATE);
+
+            return true;
+        });
+
+
+
+    }
 
     /*
     addFood: function(){
@@ -173,7 +172,7 @@ var GameLayer = cc.Layer.extend({
     deleteFood: function(sprite){
         var i = this.food.indexOf(sprite);
         if(i > -1) {
-            this.food.splice(i,1);        
+            this.food.splice(i,1);
         }
         this.food[i].getParent().removeChildByTag(food[i].getTag(), true);
     }
@@ -187,7 +186,10 @@ var GameScene = cc.Scene.extend({
         var layer = new GameLayer;
         this.addChild(layer);
         layer.init();
-    }
+
+        }
+
+
 });
 
 function move(ball, angle, speed){
@@ -239,8 +241,7 @@ function otherUsersMove(ball, angle, speed){
     else isDown = true;
     if(ball.y>map.height) isUp = false;
     else isUp = true;
-    console.log("X: "+ball.x);
-    console.log("cos: "+cos);
+
     if(cos>0){
         if(isRight) ball.x+= speed * cos;
         if(sin<0){
