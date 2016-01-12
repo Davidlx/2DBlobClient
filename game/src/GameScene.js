@@ -11,6 +11,7 @@ var userName;
 var mousePos;
 var map_userSpawnPosX=0;
 var map_userSpawnPosY=0;
+var users = new Array();
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
@@ -19,18 +20,30 @@ var GameLayer = cc.Layer.extend({
         socket.emit('user_name','test');
         var gameLayer=this;
         //cc.log("Game init");
-        var users = new Array();
-        socket.on('update_direction', function(para){
-            if (para.index!=index) {
-                HighLog(para.newDirection);
-                users[para.index].angle = para.newDirection;
-            }
-        });
+
+
 
         socket.on('game_init_info',function(para){
-            HighLog(para.position);
-            HighLog(para.name);
+            users.name=para.name;
+            users.speed=para.speed;
+            users.direction=para.direction;
+            users.score=para.score;
+            users.status=para.status;
         });
+        socket.on("User_Add", function(para){
+            if(para.index != index){
+                users[para.index] = new cc.Sprite(res.ball_png);
+                users[para.index].setAnchorPoint(0.5, 0.5);
+                users[para.index].setScale(0.03);
+                users[para.index].setPositionX = para.posi_x;
+                users[para.index].setPositionY = para.posi_y;
+                users[para.index].name = para.name;
+            }
+
+
+        });
+
+
 
         socket.on('user_initial_position',function(x,y){
             map_userSpawnPosX=x;
@@ -69,13 +82,7 @@ var GameLayer = cc.Layer.extend({
             var ball = new cc.Sprite(res.ball_png);
             ball.setAnchorPoint(0.5, 0.5);
 
-            for(var i=0; i<users.length; i++){
-                if (i != index){
-                    users[i] = new cc.Sprite(res.ball_png);
-                    users[i].setAnchorPoint(0.5, 0.5);
-                }
 
-            }
 
             // set map position
             var scr_userSpawnPosX = size.width / 2 - map_userSpawnPosX;
@@ -377,6 +384,13 @@ function getUNIXTimestamp(){
 
 socket.on('user_index',function(newIndex){
     index = newIndex;
+});
+
+socket.on('update_direction', function(para){
+    if (para.index!=index) {
+        //HighLog("angle: "+para.newDirection);
+        users[para.index].angle = para.newDirection;
+    }
 });
 
 function lowLog(msg){
