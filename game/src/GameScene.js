@@ -11,7 +11,7 @@ var userName;
 var mousePos;
 var map_userSpawnPosX=0;
 var map_userSpawnPosY=0;
-
+var thisIndex;
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
@@ -20,10 +20,21 @@ var GameLayer = cc.Layer.extend({
         socket.emit('user_name','test');
         var gameLayer=this;
         //cc.log("Game init");
+        var users = new Array();
+        socket.on('user_index',function(index){
+            thisIndex = index;
+        });
+        socket.on('user_array',function(sockets, name){
+            users = sockets;
+            console.log("!!!");
+        });
+        socket.on('update_direction', function(para){
+            users[para.index].angle = para.newDirection;
+        });
+
         socket.on('user_initial_position',function(x,y){
             map_userSpawnPosX=x;
             map_userSpawnPosY=y;
-            console.log("CONNECTION SUCCESS");
             size = cc.director.getWinSize();
 
             map = new cc.TMXTiledMap(res.map_tmx);
@@ -57,26 +68,15 @@ var GameLayer = cc.Layer.extend({
 
             var ball = new cc.Sprite(res.ball_png);
             ball.setAnchorPoint(0.5, 0.5);
-//
-            var users = new Array(99);
-            var usersNum = 2;
-            users[0] = new cc.Sprite(res.ball_png);
-            users[0].setScale(0.1);
-            users[0].setAnchorPoint(0.5, 0.5);
-            users[0].setPosition(800, 800);
 
+            for(var i=0; i<users.length; i++){
+                if (i != thisIndex){
+                    users[i] = new cc.Sprite(res.ball_png);
+                    users[i].setAnchorPoint(0.5, 0.5);
+                }
 
-            map.addChild(users[0], 0);
+            }
 
-            window.setInterval(function () {
-                users[0].angle = (Math.random() - 0.5) * 6;
-
-            }, 2000);
-
-//
-
-            //var map_userSpawnPosX = //Math.round(Math.random()*map.width);
-            //var map_userSpawnPosY = Math.round(Math.random()*map.height);
             // set map position
             var scr_userSpawnPosX = size.width / 2 - map_userSpawnPosX;
             var scr_userSpawnPosY = size.height / 2 - map_userSpawnPosY;
@@ -112,9 +112,15 @@ var GameLayer = cc.Layer.extend({
                 ball.angle = calculateAngle(mousePos, ball, angle);
                 ball.speed = 3 * calculateSpeed(mousePos, ball, speed, size);
                 move(ball, ball.angle, ball.speed);
+                socket.emit('update_user_direction', thisIndex, getUserPosition()[0], getUserPosition()[1],ball.angle,Math.round(new Date().getTime()/1000));
 
+                for(var i=0; i<users.length; i++){
+                    if (i != thisIndex){
+                        otherUsersMove(users[i], users[i].angle, 3);
+                    }
 
-                otherUsersMove(users[0], 2, 1);
+                }
+
 
 
                 for (var i = 0; i < 50; i++) {
