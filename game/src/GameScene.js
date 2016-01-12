@@ -11,7 +11,6 @@ var userName;
 var mousePos;
 var map_userSpawnPosX=0;
 var map_userSpawnPosY=0;
-var thisIndex;
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
@@ -21,15 +20,16 @@ var GameLayer = cc.Layer.extend({
         var gameLayer=this;
         //cc.log("Game init");
         var users = new Array();
-        socket.on('user_index',function(index){
-            thisIndex = index;
-        });
-        socket.on('user_array',function(sockets, name){
-            users = sockets;
-            console.log("!!!");
-        });
         socket.on('update_direction', function(para){
-            users[para.index].angle = para.newDirection;
+            if (para.index!=index) {
+                HighLog(para.newDirection);
+                users[para.index].angle = para.newDirection;
+            }
+        });
+
+        socket.on('game_init_info',function(para){
+            HighLog(para.position);
+            HighLog(para.name);
         });
 
         socket.on('user_initial_position',function(x,y){
@@ -70,7 +70,7 @@ var GameLayer = cc.Layer.extend({
             ball.setAnchorPoint(0.5, 0.5);
 
             for(var i=0; i<users.length; i++){
-                if (i != thisIndex){
+                if (i != index){
                     users[i] = new cc.Sprite(res.ball_png);
                     users[i].setAnchorPoint(0.5, 0.5);
                 }
@@ -112,10 +112,10 @@ var GameLayer = cc.Layer.extend({
                 ball.angle = calculateAngle(mousePos, ball, angle);
                 ball.speed = 3 * calculateSpeed(mousePos, ball, speed, size);
                 move(ball, ball.angle, ball.speed);
-                socket.emit('update_user_direction', thisIndex, getUserPosition()[0], getUserPosition()[1],ball.angle,Math.round(new Date().getTime()/1000));
+                socket.emit('update_user_direction', index, getUserPosition()[0], getUserPosition()[1],ball.angle,Math.round(new Date().getTime()/1000));
 
                 for(var i=0; i<users.length; i++){
-                    if (i != thisIndex){
+                    if (i != index){
                         otherUsersMove(users[i], users[i].angle, 3);
                     }
 
@@ -377,4 +377,12 @@ function getUNIXTimestamp(){
 
 socket.on('user_index',function(newIndex){
     index = newIndex;
-})
+});
+
+function lowLog(msg){
+    console.log("Low Log: "+ msg);
+}
+
+function HighLog(msg){
+    console.log("High Log: "+ msg);
+}
