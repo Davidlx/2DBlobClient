@@ -12,7 +12,8 @@ var mousePos;
 var map_userSpawnPosX=0;
 var map_userSpawnPosY=0;
 var MAX_FOOD_NUM = 100;
-var users;
+var users = new Array();
+var angle;
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
@@ -22,14 +23,28 @@ var GameLayer = cc.Layer.extend({
         var gameLayer=this;
         //cc.log("Game init");
 
-
-
+        angle = new Array();
         socket.on('game_init_info',function(para){
-            users.name=para.name;
-            users.speed=para.speed;
-            users.direction=para.direction;
-            users.score=para.score;
-            users.status=para.status;
+            for(var i=0;i<para.direction.length;i++){
+                angle[i] = para.direction[i];
+            }
+            for(var i=0;i<para.name.length;i++){
+                users[i].name = para.name[i];
+            }
+            for(var i=0;i<para.speed.length;i++){
+                users[i].speed = para.speed[i];
+            }
+            for(var i=0;i<para.score.length;i++){
+                users[i].score = para.score[i];
+            }
+            for(var i=0;i<para.status.length;i++){
+                users[i].status = para.status[i];
+            }
+            for(var i=0;i<para.position.length;i+=2){
+                users[i/2].setPositionX = para.position[i];
+                users[i/2].setPositionY = para.position[i+1];
+            }
+
         });
 
 
@@ -43,44 +58,26 @@ var GameLayer = cc.Layer.extend({
 
             food = new Array(MAX_FOOD_NUM);
 
-            // I do not think this is useful
-            /* real code when server is online
-             io.emit('place_food',function(food_pos_x, food_pos_y){
-             var random_num = Math.round(Math.random()*3);
-             if(random_num == 0) food[food_index] = new cc.Sprite(res.food_red_png);
-             if(random_num == 1) food[food_index] = new cc.Sprite(res.food_blue_png);
-             if(random_num == 2) food[food_index] = new cc.Sprite(res.food_green_png);
-             if(random_num == 3) food[food_index] = new cc.Sprite(res.food_purple_png);
-             food[food_index].setAnchorPoint(0.5, 0.5);
-             food[food_index].setPosition(food_pos_x, food_pos_y);
-             this.addChild(food[food_index],0);
-             food_index++;
-             });
-             */
             //var test = new Array();
             //test[0] = new cc.Sprite(res.ball_png);
             //test[0].setAnchorPoint(0.5, 0.5);
             //test[0].setScale(0.03);
-            //test[0].setPositionX = 100;
-            //test[0].setPositionY = 100;
+            //test[0].setPosition(100,100);
+            //map.addChild(test[0],0);
 
-            var test = new cc.Sprite(res.ball_png);
-            test.setAnchorPoint(0.5, 0.5);
-            test.setScale(0.05);
-            test.setPositionX = 200;
-            test.setPositionY = 200;
-            map.addChild(test,0);
-            users = new Array(10);
+
             socket.on("User_Add", function(para){
-                if(para.index != index){
-                    users[para.index] = new cc.Sprite(res.ball_png);
-                    users[para.index].setAnchorPoint(0.5, 0.5);
-                    users[para.index].setScale(0.03);
-                    users[para.index].setPositionX = 100;//para.posi_x;
-                    users[para.index].setPositionY = 100;//para.posi_y;
-                    //users[para.index].name = para.name;
-                    map.addChild(users[para.index],0);
-                }
+                users[para.index] = new cc.Sprite(res.ball_png);
+                users[para.index].setAnchorPoint(0.5, 0.5);
+                users[para.index].setScale(0.03);
+                users[para.index].setPosition(100,100);
+                users[para.index].name = para.name;
+                map.addChild(users[para.index],0);
+                window.setInterval(function () {
+                    HighLog(para.index+" angle1: "+angle[para.index]);
+                    otherUsersMove(users[para.index], angle[para.index], 3);
+                },REFRESH_TIME);
+
             });
 
             //The following is for demo
@@ -132,13 +129,7 @@ var GameLayer = cc.Layer.extend({
             }, REFRESH_TIME);
 
             //other user's movement
-            window.setInterval(function () {
-                for(var i=0; i<users.length; i++){
-                    if (i != index){
-                        otherUsersMove(users[i].ball, users[i].angle, 3);
-                    }
-                }
-            },REFRESH_TIME);
+
 
             //collision detection
             window.setInterval(function () {
@@ -171,8 +162,8 @@ var GameLayer = cc.Layer.extend({
         socket.on('update_direction', function(para){
             if (para.index!=index) {
                 //HighLog("angle: "+para.newDirection);
-                users[para.index].angle = para.newDirection;
-                HighLog("angle: "+users[para.index].angle);
+                angle[para.index] = para.newDirection;
+                HighLog(para.index+" angle2: "+angle[para.index]);
             }
         });
 
@@ -183,12 +174,12 @@ var GameLayer = cc.Layer.extend({
         });
 
         socket.on('update_position', function(para){
-            users[para.index].status = para.status;
+            users[para.index].setPositionX = para.posi_x;
+            users[para.index].setPositionY = para.posi_y;
         });
 
         socket.on('update_status', function(para){
-            users[para.index].setPositionX = para.posi_x;
-            users[para.index].setPositionY = para.posi_y;
+            users[para.index].status = para.status;
         });
 
         socket.on('update_score', function(para){
