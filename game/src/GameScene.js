@@ -12,7 +12,7 @@ var mousePos;
 var map_userSpawnPosX=0;
 var map_userSpawnPosY=0;
 var MAX_FOOD_NUM = 100;
-var users = new Array();
+var users;
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
@@ -31,16 +31,7 @@ var GameLayer = cc.Layer.extend({
             users.score=para.score;
             users.status=para.status;
         });
-        socket.on("User_Add", function(para){
-            if(para.index != index){
-                users[para.index].ball = new cc.Sprite(res.ball_png);
-                users[para.index].setAnchorPoint(0.5, 0.5);
-                users[para.index].setScale(0.03);
-                users[para.index].setPositionX = para.posi_x;
-                users[para.index].setPositionY = para.posi_y;
-                users[para.index].name = para.name;
-            }
-        });
+
 
         socket.on('user_initial_position',function(x,y){
             map_userSpawnPosX=x;
@@ -66,7 +57,31 @@ var GameLayer = cc.Layer.extend({
              food_index++;
              });
              */
+            //var test = new Array();
+            //test[0] = new cc.Sprite(res.ball_png);
+            //test[0].setAnchorPoint(0.5, 0.5);
+            //test[0].setScale(0.03);
+            //test[0].setPositionX = 100;
+            //test[0].setPositionY = 100;
 
+            var test = new cc.Sprite(res.ball_png);
+            test.setAnchorPoint(0.5, 0.5);
+            test.setScale(0.05);
+            test.setPositionX = 200;
+            test.setPositionY = 200;
+            map.addChild(test,0);
+            users = new Array(10);
+            socket.on("User_Add", function(para){
+                if(para.index != index){
+                    users[para.index] = new cc.Sprite(res.ball_png);
+                    users[para.index].setAnchorPoint(0.5, 0.5);
+                    users[para.index].setScale(0.03);
+                    users[para.index].setPositionX = 100;//para.posi_x;
+                    users[para.index].setPositionY = 100;//para.posi_y;
+                    //users[para.index].name = para.name;
+                    map.addChild(users[para.index],0);
+                }
+            });
 
             //The following is for demo
             for (var i = 0; i < 50; i++) {
@@ -157,6 +172,7 @@ var GameLayer = cc.Layer.extend({
             if (para.index!=index) {
                 //HighLog("angle: "+para.newDirection);
                 users[para.index].angle = para.newDirection;
+                HighLog("angle: "+users[para.index].angle);
             }
         });
 
