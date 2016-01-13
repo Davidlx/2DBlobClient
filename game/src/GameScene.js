@@ -82,7 +82,6 @@ var GameLayer = cc.Layer.extend({
                 angles.push(0);
                 map.addChild(users[para.index],0);
                 window.setInterval(function () {
-                    HighLog(typeof angles);
                     HighLog(para.index+" angle1: "+angles[para.index]);
                     otherUsersMove(users[para.index], angles[para.index], 3);
                 },REFRESH_TIME);
@@ -171,8 +170,8 @@ var GameLayer = cc.Layer.extend({
         socket.on('update_direction', function(para){
             if (para.index!=index) {
                 //HighLog("angle: "+para.newDirection);
-                angle[para.index] = para.newDirection;
-                HighLog(para.index+" angle2: "+angle[para.index]);
+                angles[para.index] = para.newDirection;
+                HighLog(para.index+" angle2: "+angles[para.index]);
             }
         });
 
@@ -269,19 +268,19 @@ function otherUsersMove(ball, angle, speed){
     if(ball.y>map.height) isUp = false;
     else isUp = true;
 
-    if(cos>0){
-        if(isRight) ball.x+= speed * cos;
+    if(cos<0){
+        if(isRight) ball.x-= speed * cos;
         if(sin<0){
-            if(isDown) ball.y+= speed * sin;
+            if(isDown) ball.y-= speed * sin;
         }else{
-            if(isUp) ball.y += speed * sin;
+            if(isUp) ball.y -= speed * sin;
         }
     }else {
-        if(isLeft) ball.x += speed * cos;
+        if(isLeft) ball.x -= speed * cos;
         if(sin<0){
-            if(isDown) ball.y += speed * sin;
+            if(isDown) ball.y -= speed * sin;
         }else{
-            if(isUp) ball.y += speed * sin;
+            if(isUp) ball.y -= speed * sin;
         }
     }
 }
@@ -331,7 +330,7 @@ function calculateAngle(sourcePoint,targetPoint,angle){//ball - source, mouse - 
     if (tempAngle != angle) {
         //upload server - angle changed
         //console.log("angle changed");
-        socket.emit('update_user_direction',index,sourcePoint.x,sourcePoint.y,tempAngle,getUNIXTimestamp());
+        socket.emit('update_user_direction',index,getUserPosition()[0],getUserPosition()[1],tempAngle,getUNIXTimestamp());
     }
     return tempAngle;
 }
@@ -339,7 +338,7 @@ function calculateAngle(sourcePoint,targetPoint,angle){//ball - source, mouse - 
 function calculateSpeed(sourcePoint,targetPoint,speed,size){//ball - source, mouse - targetpoint
     var tempSpeed = calculateSpeedAlgorithm(sourcePoint,targetPoint,size);
     if (tempSpeed != speed) {
-        socket.emit('update_user_speed',index,sourcePoint.x,sourcePoint.y,tempSpeed,getUNIXTimestamp());
+        socket.emit('update_user_speed',index,getUserPosition()[0],getUserPosition()[1],tempSpeed,getUNIXTimestamp());
     }
     return tempSpeed;
 }
@@ -392,5 +391,5 @@ function lowLog(msg){
 }
 
 function HighLog(msg){
-    //console.log("High Log: "+ msg);
+    console.log("High Log: "+ msg);
 }
