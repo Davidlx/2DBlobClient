@@ -47,7 +47,9 @@ var GameLayer = cc.Layer.extend({
                 userPos[i] = para.position[i];
                 userPos[i+1] = para.position[i+1];
             }
-
+            for(var i=0;i<para.foodPosition.length;i+=2){
+                addFoodOnMap(i/2,para.foodPosition[i],para.foodPosition[i+1]);
+            }
         });
 
 
