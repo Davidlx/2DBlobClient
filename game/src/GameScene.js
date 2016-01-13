@@ -11,6 +11,7 @@ var userName;
 var mousePos;
 var map_userSpawnPosX=0;
 var map_userSpawnPosY=0;
+
 var users = new Array();
 var userNames = [];
 var userSpeed = [];
@@ -18,6 +19,9 @@ var userScore = [];
 var userStatus = [];
 var userPos = [];
 var angles = [];
+var food_posi = [];
+var food_type = [];
+
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
@@ -26,6 +30,7 @@ var GameLayer = cc.Layer.extend({
         socket.emit('user_name','test');
         var gameLayer=this;
         //cc.log("Game init");
+         map = new cc.TMXTiledMap(res.map_tmx);
 
         socket.on('game_init_info',function(para){
             for(var i=0;i<para.direction.length;i++){
@@ -47,9 +52,16 @@ var GameLayer = cc.Layer.extend({
                 userPos[i] = para.position[i];
                 userPos[i+1] = para.position[i+1];
             }
-            for(var i=0;i<para.foodPosition.length;i+=2){
-                addFoodOnMap(i/2,para.foodPosition[i],para.foodPosition[i+1]);
+            for(var i=0;i<para.food.length;i+=2){
+                food_posi[i] = para.food[i];
+                food_posi[i+1] = para.food[i+1];
+                console.log(para.food[i]);
+                addFoodOnMap(i/2,para.food[i],para.food[i+1]);
             }
+            for(var i=0;i<para.food_type.length;i++){
+                food_type[i] = para.food_type[i];
+            }
+            console.log(para.food);
         });
 
 
@@ -58,7 +70,7 @@ var GameLayer = cc.Layer.extend({
             map_userSpawnPosY=y;
             size = cc.director.getWinSize();
 
-            map = new cc.TMXTiledMap(res.map_tmx);
+
             gameLayer.addChild(map, 0);
 
 
@@ -81,6 +93,9 @@ var GameLayer = cc.Layer.extend({
 
             socket.on('food_add', function(para){
                 if(para.type == 0){
+                    food_posi[para.food_index*2] = para.posi_x;
+                    food_posi[para.food_index*2+2] = para.posi_y;
+                    food_type[para.food_index] = 0;
                     addFoodOnMap(para.food_index,para.posi_x,para.posi_y);
                 }
             });
@@ -133,21 +148,29 @@ var GameLayer = cc.Layer.extend({
 
             //collision detection
             window.setInterval(function () {
-                for (var i = 0; i < 50; i++) {
-                    var currentBallScale = ball.getScale();
+                var temp_x = ball.x;
+                var temp_y = ball.y;
+                for (var i = 0; i < food_type.length; i++) {
+                    //var currentBallScale = ball.getScale();
                     if (collisionDetection(ball, food[i])) {
+                        HighLog(temp_x);
+                        HighLog(temp_y);
                         socket.emit('food_eat', index, ball.x,ball.y,i,getUNIXTimestamp());
-                        socket.on('food_eat_succ', function(){
-                            score++;
-                            ball.setScale(calculatePlayerScale(ball));
-
-                            userName.setFontSize((ballSize / 2) * calculatePlayerScale(ball));
-                            cc.log("font size : " + userName.getFontSize() * calculatePlayerScale(userName));
-                            map.removeChild(food[i], true);
-                        });
                     }
                 }
             },REFRESH_TIME);
+
+            socket.on('food_eat_succ', function(para){
+                //any user who have eat a food will cause this.
+                // if the food index and user index matched, then delete,
+                //new scores will be sent to you
+                score++;
+                ball.setScale(calculatePlayerScale(ball));
+
+                userName.setFontSize((ballSize / 2) * calculatePlayerScale(ball));
+                cc.log("font size : " + userName.getFontSize() * calculatePlayerScale(userName));
+                map.removeChild(food[i], true);
+            });
 
             //regular updates
             window.setInterval(function () {
