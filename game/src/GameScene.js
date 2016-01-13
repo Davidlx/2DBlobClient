@@ -13,7 +13,13 @@ var map_userSpawnPosX=0;
 var map_userSpawnPosY=0;
 var MAX_FOOD_NUM = 100;
 var users = new Array();
-var angle = [];
+var userNames = [];
+var userSpeed = [];
+var userScore = [];
+var userStatus = [];
+var userX = [];
+var userY = [];
+var angles = [];
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
@@ -23,26 +29,25 @@ var GameLayer = cc.Layer.extend({
         var gameLayer=this;
         //cc.log("Game init");
 
-        angle = new Array();
         socket.on('game_init_info',function(para){
             for(var i=0;i<para.direction.length;i++){
-                angle[i] = para.direction[i];
+                angles[i] = para.direction[i];
             }
             for(var i=0;i<para.name.length;i++){
-                users[i].name = para.name[i];
+                userNames[i] = para.name[i];
             }
             for(var i=0;i<para.speed.length;i++){
-                users[i].speed = para.speed[i];
+                userSpeed[i] = para.speed[i];
             }
             for(var i=0;i<para.score.length;i++){
-                users[i].score = para.score[i];
+                userScore[i] = para.score[i];
             }
             for(var i=0;i<para.status.length;i++){
-                users[i].status = para.status[i];
+                userStatus[i] = para.status[i];
             }
             for(var i=0;i<para.position.length;i+=2){
-                users[i/2].setPositionX = para.position[i];
-                users[i/2].setPositionY = para.position[i+1];
+                userX[i] = para.position[i];
+                userY[i] = para.position[i+1];
             }
 
         });
@@ -67,18 +72,19 @@ var GameLayer = cc.Layer.extend({
 
 
             socket.on("User_Add", function(para){
+                console.log(typeof userNames);
                 users[para.index] = new cc.Sprite(res.ball_png);
                 users[para.index].setAnchorPoint(0.5, 0.5);
                 users[para.index].setScale(0.03);
                 users[para.index].setPosition(100,100);
-                users[para.index].name = para.name;
-                users[para.index].speed = 0;
-                angle.push(0);
+                userNames.push(para.name);
+                userSpeed.push(0);
+                angles.push(0);
                 map.addChild(users[para.index],0);
                 window.setInterval(function () {
-                    HighLog(angle);
-                    HighLog(para.index+" angle1: "+angle[para.index]);
-                    //otherUsersMove(users[para.index], angle[para.index], 3);
+                    HighLog(typeof angles);
+                    HighLog(para.index+" angle1: "+angles[para.index]);
+                    otherUsersMove(users[para.index], angles[para.index], 3);
                 },REFRESH_TIME);
 
             });
@@ -386,5 +392,5 @@ function lowLog(msg){
 }
 
 function HighLog(msg){
-    console.log("High Log: "+ msg);
+    //console.log("High Log: "+ msg);
 }
