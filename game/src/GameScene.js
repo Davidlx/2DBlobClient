@@ -6,19 +6,17 @@ var size;
 var map;
 var ballSize;
 var score;
-var food;
+var food = [];
 var userName;
 var mousePos;
 var map_userSpawnPosX=0;
 var map_userSpawnPosY=0;
-var MAX_FOOD_NUM = 100;
 var users = new Array();
 var userNames = [];
 var userSpeed = [];
 var userScore = [];
 var userStatus = [];
-var userX = [];
-var userY = [];
+var userPos = [];
 var angles = [];
 var GameLayer = cc.Layer.extend({
 
@@ -46,8 +44,8 @@ var GameLayer = cc.Layer.extend({
                 userStatus[i] = para.status[i];
             }
             for(var i=0;i<para.position.length;i+=2){
-                userX[i] = para.position[i];
-                userY[i] = para.position[i+1];
+                userPos[i] = para.position[i];
+                userPos[i+1] = para.position[i+1];
             }
 
         });
@@ -60,15 +58,6 @@ var GameLayer = cc.Layer.extend({
 
             map = new cc.TMXTiledMap(res.map_tmx);
             gameLayer.addChild(map, 0);
-
-            food = new Array(MAX_FOOD_NUM);
-
-            //var test = new Array();
-            //test[0] = new cc.Sprite(res.ball_png);
-            //test[0].setAnchorPoint(0.5, 0.5);
-            //test[0].setScale(0.03);
-            //test[0].setPosition(100,100);
-            //map.addChild(test[0],0);
 
 
             socket.on("User_Add", function(para){
@@ -88,12 +77,13 @@ var GameLayer = cc.Layer.extend({
 
             });
 
-            //The following is for demo
-            for (var i = 0; i < 50; i++) {
-                addFood(i);
-            }
+            socket.on('food_add', function(para){
+                if(para.type == 0){
+                    addFoodOnMap(para.food_index,para.posi_x,para.posi_y);
+                }
+            });
 
-            // demo ended
+
 
             var ball = new cc.Sprite(res.ball_png);
             ball.setAnchorPoint(0.5, 0.5);
@@ -144,14 +134,15 @@ var GameLayer = cc.Layer.extend({
                 for (var i = 0; i < 50; i++) {
                     var currentBallScale = ball.getScale();
                     if (collisionDetection(ball, food[i])) {
-                        score++;
-                        ball.setScale(calculatePlayerScale(ball));
+                        socket.emit('food_eat', index, ball.x,ball.y,i,getUNIXTimestamp());
+                        socket.on('food_eat_succ', function(){
+                            score++;
+                            ball.setScale(calculatePlayerScale(ball));
 
-                        userName.setFontSize((ballSize / 2) * calculatePlayerScale(ball));
-                        cc.log("font size : " + userName.getFontSize() * calculatePlayerScale(userName));
-
-                        map.removeChild(food[i], true);
-                        addFood(i);
+                            userName.setFontSize((ballSize / 2) * calculatePlayerScale(ball));
+                            cc.log("font size : " + userName.getFontSize() * calculatePlayerScale(userName));
+                            map.removeChild(food[i], true);
+                        });
                     }
                 }
             },REFRESH_TIME);
