@@ -13,7 +13,7 @@ var map_userSpawnPosX=0;
 var map_userSpawnPosY=0;
 var MAX_FOOD_NUM = 100;
 var users = new Array();
-var angle;
+var angle = [];
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
@@ -72,10 +72,13 @@ var GameLayer = cc.Layer.extend({
                 users[para.index].setScale(0.03);
                 users[para.index].setPosition(100,100);
                 users[para.index].name = para.name;
+                users[para.index].speed = 0;
+                angle.push(0);
                 map.addChild(users[para.index],0);
                 window.setInterval(function () {
+                    HighLog(angle);
                     HighLog(para.index+" angle1: "+angle[para.index]);
-                    otherUsersMove(users[para.index], angle[para.index], 3);
+                    //otherUsersMove(users[para.index], angle[para.index], 3);
                 },REFRESH_TIME);
 
             });
