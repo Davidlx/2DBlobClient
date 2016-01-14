@@ -5,7 +5,6 @@ var index = 0;
 var size;
 var map;
 var ballSize;
-var score;
 var food = [];
 var userName;
 var mousePos;
@@ -52,15 +51,14 @@ var GameLayer = cc.Layer.extend({
                 userPos[i] = para.position[i];
                 userPos[i+1] = para.position[i+1];
             }
-            //for(var i=0;i<para.food.length;i+=2){
-            //    food_posi[i] = para.food[i];
-            //    food_posi[i+1] = para.food[i+1];
-            //    console.log(para.food[i]);
-            //    addFoodOnMap(i/2,para.food[i],para.food[i+1]);
-            //}
-            //for(var i=0;i<para.food_type.length;i++){
-            //    food_type[i] = para.food_type[i];
-            //}
+            for(var i=0;i<para.food.length;i+=2){
+                food_posi[i] = para.food[i];
+                food_posi[i+1] = para.food[i+1];
+                addFoodOnMap(i/2,para.food[i],para.food[i+1]);
+            }
+            for(var i=0;i<para.food_type.length;i++){
+                food_type[i] = para.food_type[i];
+            }
 
 
         });
@@ -125,7 +123,7 @@ var GameLayer = cc.Layer.extend({
             var REGULAR_UPDATES_RATE = 100;
             var speed = 0;
             var angle = 0;
-            score = 0;
+
             cc.eventManager.addListener({
                 event: cc.EventListener.MOUSE,
                 onMouseMove: function (event) {
@@ -151,8 +149,9 @@ var GameLayer = cc.Layer.extend({
 
             //collision detection
             window.setInterval(function () {
-                var temp_x = ball.x;
-                var temp_y = ball.y;
+                var temp_x = getUserPosition()[0];
+                var temp_y = getUserPosition()[1];
+
                 for (var i = 0; i < food_type.length; i++) {
                     //var currentBallScale = ball.getScale();
                     if (collisionDetection(ball, food[i])) {
@@ -167,11 +166,15 @@ var GameLayer = cc.Layer.extend({
                 //any user who have eat a food will cause this.
                 // if the food index and user index matched, then delete,
                 //new scores will be sent to you
-                score++;
-                ball.setScale(calculatePlayerScale(ball));
-
-                userName.setFontSize((ballSize / 2) * calculatePlayerScale(ball));
-                cc.log("font size : " + userName.getFontSize() * calculatePlayerScale(userName));
+                userScore[para.index]++;
+                if(para.index == index){
+                    ball.setScale(calculatePlayerScale(para.index));
+                    userName.setFontSize((ballSize / 2) * calculatePlayerScale(ball));
+                }
+                else{
+                    users[para.index].setScale(calculatePlayerScale(para.index));
+                    //TODO: username size
+                }
                 map.removeChild(food[i], true);
             });
 
@@ -203,7 +206,7 @@ var GameLayer = cc.Layer.extend({
             if (para.index!=index) {
                 //HighLog("angle: "+para.newDirection);
                 angles[para.index] = para.newDirection;
-                HighLog(para.index+" angle2: "+angles[para.index]);
+                //HighLog(para.index+" angle2: "+angles[para.index]);
             }
         });
 
@@ -223,7 +226,7 @@ var GameLayer = cc.Layer.extend({
         });
 
         socket.on('update_score', function(para){
-            users[para.index].score = para.score;
+            userScore[para.index] = para.score;
         });
 
         }
@@ -384,13 +387,13 @@ function calculateSpeedAlgorithm(soucePoint,targetPoint,size){
 }
 
 
-function calculatePlayerScale(player){
+function calculatePlayerScale(user_index){
     var scale;
-    if(score<100){
-        scale = player.getScale() + 0.005;
+    if(userScore[user_index]<100){
+        scale = users[user_index].getScale() + 0.005;
     }
     else{
-        scale = player.getScale() + 0.0005;
+        scale = users[user_index].getScale() + 0.0005;
     }
     //var scale = 0.03*(Math.log(score+1)+1);
     return scale;
@@ -423,5 +426,5 @@ function lowLog(msg){
 }
 
 function HighLog(msg){
-    //console.log("High Log: "+ msg);
+    console.log("High Log: "+ msg);
 }
