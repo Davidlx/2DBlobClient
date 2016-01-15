@@ -84,6 +84,17 @@ var GameLayer = cc.Layer.extend({
             }
         },ball);
 
+            var scoreBox = new cc.Sprite(res.scoreBox_png);
+            scoreBox.setPosition(size.width - 95, 50);
+            scoreBox.setScale(0.5);
+            this.addChild(scoreBox);
+            
+            scoreUI = new cc.LabelTTF("Score : " + score, "Arial");
+            scoreUI.setFontSize(24);
+            scoreUI.setPosition(size.width - 95, 50);
+            scoreUI.setColor(cc.color(255,255,255));
+            this.addChild(scoreUI,0);
+
         window.setInterval(function(){
             var isLeft = true;
             var isRight = true;
@@ -135,6 +146,7 @@ var GameLayer = cc.Layer.extend({
                     userName.setFontSize((ballSize/2) * calculatePlayerScale(ball));
                     cc.log("font size : "+userName.getFontSize()*calculatePlayerScale(userName));
 
+                    scoreUI.setString("Score : " + score);
                     map.removeChild(food[i], true);
                     addFood(i);
                 }

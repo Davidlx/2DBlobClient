@@ -18,7 +18,8 @@ var res = {
     home_png: "res/home.png",
     home_down_png: "res/home_down.png",
     about_bg_png : "res/about_bg.png",
-    title_png:"res/title.png"
+    title_png:"res/title.png",
+    scoreBox_png:"res/scoreBox.png"
 };
 
 var g_resources = [];
