@@ -148,14 +148,10 @@ var GameLayer = cc.Layer.extend({
 
             //collision detection
             window.setInterval(function () {
-                var temp_x = ball.x;
-                var temp_y = ball.y;
                 for (var i = 0; i < food_type.length; i++) {
                     //var currentBallScale = ball.getScale();
                     if (collisionDetection(ball, food[i])) {
-                        HighLog(temp_x);
-                        HighLog(temp_y);
-                        socket.emit('food_eat', index, ball.x,ball.y,i,getUNIXTimestamp());
+                        socket.emit('food_eat', index, getUserPosition()[0],getUserPosition()[1],i,getUNIXTimestamp());
                     }
                 }
             },REFRESH_TIME);
@@ -164,17 +160,22 @@ var GameLayer = cc.Layer.extend({
                 //any user who have eat a food will cause this.
                 // if the food index and user index matched, then delete,
                 //new scores will be sent to you
-                score++;
+                HighLog("Food Eat Received");
+                if (para.index == index) {
+                    score = para.score;
+                }else{
+                    userScore[para.index] = para.score;
+                }
                 ball.setScale(calculatePlayerScale(ball));
 
                 userName.setFontSize((ballSize / 2) * calculatePlayerScale(ball));
-                cc.log("font size : " + userName.getFontSize() * calculatePlayerScale(userName));
-                map.removeChild(food[i], true);
+                HighLog("font size : " + userName.getFontSize() * calculatePlayerScale(userName));
+                map.removeChild(food[para.food_index], true);
             });
 
             //regular updates
             window.setInterval(function () {
-                socket.emit('regular_updates', index, ball.x, ball.y, getUNIXTimestamp());
+                socket.emit('regular_updates', index,getUserPosition()[0],getUserPosition()[1], getUNIXTimestamp());
             }, REGULAR_UPDATES_RATE);
             return true;
         });
@@ -354,6 +355,7 @@ function calculateAngle(sourcePoint,targetPoint,angle){//ball - source, mouse - 
 function calculateSpeed(sourcePoint,targetPoint,speed,size){//ball - source, mouse - targetpoint
     var tempSpeed = calculateSpeedAlgorithm(sourcePoint,targetPoint,size);
     if (tempSpeed != speed) {
+        speed = tempSpeed;
         socket.emit('update_user_speed',index,getUserPosition()[0],getUserPosition()[1],tempSpeed,getUNIXTimestamp());
     }
     return tempSpeed;
