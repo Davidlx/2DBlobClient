@@ -1,6 +1,7 @@
 var url = window.location.href;
 console.log(url);
 var socket = io(url);
+var REFRESH_TIME = 10;
 var index = 0;
 var size;
 var map;
@@ -61,6 +62,7 @@ var GameLayer = cc.Layer.extend({
             for(var i=0;i<para.food_type.length;i++){
                 food_type[i] = para.food_type[i];
             }
+
             console.log(para.food);
         });
 
@@ -85,7 +87,6 @@ var GameLayer = cc.Layer.extend({
                 angles.push(0);
                 map.addChild(users[para.index],0);
                 window.setInterval(function () {
-                    HighLog(para.index+" angle1: "+angles[para.index]);
                     otherUsersMove(users[para.index], angles[para.index], 3);
                 },REFRESH_TIME);
 
@@ -123,7 +124,7 @@ var GameLayer = cc.Layer.extend({
             userName.setColor(cc.color(0, 0, 0));
             gameLayer.addChild(userName, 0);
 
-            var REFRESH_TIME = 10;
+
             var REGULAR_UPDATES_RATE = 100;
             var speed = 0;
             var angle = 0;
@@ -144,6 +145,19 @@ var GameLayer = cc.Layer.extend({
             }, REFRESH_TIME);
 
             //other user's movement
+            for(var i=0;i<index;i++){
+                users[i] = new cc.Sprite(res.ball_png);
+                users[i].setAnchorPoint(0.5, 0.5);
+                users[i].setScale(0.03);
+                users[i].setPosition(userPos[i*2],userPos[i*2+1]);
+                map.addChild(users[i],0);
+            }
+            window.setInterval(function () {
+                for(var i=0;i<index;i++) {
+                    otherUsersMove(users[i], angles[i], 3);
+                }
+            },REFRESH_TIME);
+
 
 
             //collision detection
@@ -183,6 +197,7 @@ var GameLayer = cc.Layer.extend({
 
         socket.on('user_index',function(newIndex){
             index = newIndex;
+
         });
 
         socket.on('update_direction', function(para){
@@ -289,16 +304,16 @@ function otherUsersMove(ball, angle, speed){
     if(cos<0){
         if(isRight) ball.x-= speed * cos;
         if(sin<0){
-            if(isDown) ball.y-= speed * sin;
+            if(isUp) ball.y-= speed * sin;
         }else{
-            if(isUp) ball.y -= speed * sin;
+            if(isDown) ball.y -= speed * sin;
         }
     }else {
         if(isLeft) ball.x -= speed * cos;
         if(sin<0){
-            if(isDown) ball.y -= speed * sin;
-        }else{
             if(isUp) ball.y -= speed * sin;
+        }else{
+            if(isDown) ball.y -= speed * sin;
         }
     }
 }
@@ -410,5 +425,5 @@ function lowLog(msg){
 }
 
 function HighLog(msg){
-    console.log("High Log: "+ msg);
+    //console.log("High Log: "+ msg);
 }
