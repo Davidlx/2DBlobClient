@@ -76,7 +76,7 @@ var GameLayer = cc.Layer.extend({
             socket.on("User_Add", function(para){
                 users[para.index] = new cc.Sprite(res.ball_png);
                 users[para.index].setAnchorPoint(0.5, 0.5);
-                users[para.index].setScale(0.03);
+                users[para.index].setScale(0.025);
                 users[para.index].setPosition(100,100);
                 userNames.push(para.name);
                 userSpeed.push(0);
@@ -110,7 +110,7 @@ var GameLayer = cc.Layer.extend({
             ball.setPosition(size.width / 2, size.height / 2);
             map.setPosition(scr_userSpawnPosX, scr_userSpawnPosY);
             ballSize = ball.getContentSize().width;
-            ball.setScale(0.03);
+            ball.setScale(0.025);
             gameLayer.addChild(ball, 0);
 
             userName = new cc.LabelTTF("test", "Arial");
@@ -138,7 +138,7 @@ var GameLayer = cc.Layer.extend({
             for(var i=0;i<index;i++){
                 users[i] = new cc.Sprite(res.ball_png);
                 users[i].setAnchorPoint(0.5, 0.5);
-                users[i].setScale(calculatePlayerScale(users[i],userScore[i]));
+                users[i].setScale(calculatePlayerScale(userScore[i]));
                 users[i].setPosition(userPos[i*2],userPos[i*2+1]);
                 map.addChild(users[i],0);
             }
@@ -178,11 +178,13 @@ var GameLayer = cc.Layer.extend({
                 userScore[para.index] = para.score;
                 lowLog(para.index +": "+ para.score);
                 if(para.index == index){
-                    ball.setScale(calculatePlayerScale(ball,userScore[index]));
-                    userName.setFontSize((ballSize / 2) * calculatePlayerScale(ball,userScore[index]));
+                    ball.setScale(calculatePlayerScale(userScore[index]));
+                    userName.setFontSize((ballSize / 2) * calculatePlayerScale(userScore[index]));
                 }
                 else{
-                    users[para.index].setScale(calculatePlayerScale(users[para.index],userScore[index]));
+                    users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
+                    lowLog("score:  "+ userScore[index]);
+                    lowLog("Scale: "+users[para.index].getScale());
                 }
                 map.removeChild(food[para.food_index], true);
             });
@@ -385,13 +387,13 @@ function calculateSpeedAlgorithm(soucePoint,targetPoint,size){
 }
 
 
-function calculatePlayerScale(player, score){
+function calculatePlayerScale(score){
     var scale;
     if(score<100){
-        scale = 0.03+ score*0.005;
+        scale = score*0.005;
     }
     else{
-        scale = 0.03+ 100*0.005 + (score-100)*0.0005;
+        scale = 100*0.005 + (score-100)*0.0005;
     }
     return scale;
 }
