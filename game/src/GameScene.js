@@ -141,6 +141,7 @@ var GameLayer = cc.Layer.extend({
                 users[i].setScale(calculatePlayerScale(userScore[i]));
                 users[i].setPosition(userPos[i*2],userPos[i*2+1]);
                 map.addChild(users[i],0);
+
             }
 
             //update speed and angle
@@ -210,15 +211,18 @@ var GameLayer = cc.Layer.extend({
                     //TODO: game over
                     lowLog("GAME OVER!");
                 }
+                else{
+                    map.removeChild(users[para.user_index], true);
+                }
                 //TODO: delete user
-                //users.splice(para.user_index);
-                //angles.splice(para.user_index);
-                //userScore.splice(para.user_index);
-                //userNames.splice(para.user_index);
-                //userSpeed.splice(para.user_index);
-                //userStatus.splice(para.user_index);
-                //userPos.splice(para.user_index*2);
-                //userPos.splice(para.user_index*2+1);
+                users.splice(para.user_index,1);
+                angles.splice(para.user_index,1);
+                userScore.splice(para.user_index,1);
+                userNames.splice(para.user_index,1);
+                userSpeed.splice(para.user_index,1);
+                userStatus.splice(para.user_index,1);
+                userPos.splice(para.user_index*2,1);
+                userPos.splice(para.user_index*2+1,1);
             });
 
             //regular updates
@@ -251,7 +255,7 @@ var GameLayer = cc.Layer.extend({
         });
 
         socket.on('update_status', function(para){
-            users[para.index].status = para.status;
+            userStatus[para.index] = para.status;
         });
 
         socket.on('update_score', function(para){
