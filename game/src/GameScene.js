@@ -161,10 +161,15 @@ var GameLayer = cc.Layer.extend({
             //collision detection
             window.setInterval(function () {
                 for (var i = 0; i < food_type.length; i++) {
-                    //var currentBallScale = ball.getScale();
                     if (collisionDetection(ball, food[i])) {
-                        HighLog("Collision: ball "+getUserPosition()[0]+" "+getUserPosition()[1]+ " food: "+food_posi[i*2]+" "+food_posi[i*2+1]);
+                        //HighLog("Collision: ball "+getUserPosition()[0]+" "+getUserPosition()[1]+ " food: "+food_posi[i*2]+" "+food_posi[i*2+1]);
                         socket.emit('food_eat', index, getUserPosition()[0],getUserPosition()[1],i,getUNIXTimestamp());
+                    }
+                }
+                for (var i = 0; i < users.length; i++) {
+                    if(i!=index && collisionDetection(ball, users[i])){
+                        socket.emit('eat_user', index, getUserPosition()[0],getUserPosition()[1],i,getUNIXTimestamp());
+                        HighLog("User Collision");
                     }
                 }
             },REFRESH_TIME);
@@ -176,17 +181,44 @@ var GameLayer = cc.Layer.extend({
                 HighLog("Food Eat Received");
 
                 userScore[para.index] = para.score;
-                lowLog(para.index +": "+ para.score);
                 if(para.index == index){
                     ball.setScale(calculatePlayerScale(userScore[index]));
                     userName.setFontSize((ballSize / 2) * calculatePlayerScale(userScore[index]));
                 }
                 else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
-                    lowLog("score:  "+ userScore[index]);
-                    lowLog("Scale: "+users[para.index].getScale());
                 }
                 map.removeChild(food[para.food_index], true);
+            });
+
+            socket.on('user_eat_succ', function(para){
+                //any user who have eat a food will cause this.
+                // if the food index and user index matched, then delete,
+                //new scores will be sent to you
+                HighLog("User Eat Received");
+
+                userScore[para.index] = para.score;
+                if(para.index == index){
+                    ball.setScale(calculatePlayerScale(userScore[para.index]));
+                    userName.setFontSize((ballSize / 2) * calculatePlayerScale(userScore[index]));
+                    lowLog("YOU HAVE EATEN A USER!");
+                }
+                else{
+                    users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
+                }
+                if(para.user_index==index){
+                    //TODO: game over
+                    lowLog("GAME OVER!");
+                }
+                //TODO: delete user
+                //users.splice(para.user_index);
+                //angles.splice(para.user_index);
+                //userScore.splice(para.user_index);
+                //userNames.splice(para.user_index);
+                //userSpeed.splice(para.user_index);
+                //userStatus.splice(para.user_index);
+                //userPos.splice(para.user_index*2);
+                //userPos.splice(para.user_index*2+1);
             });
 
             //regular updates
@@ -203,9 +235,7 @@ var GameLayer = cc.Layer.extend({
 
         socket.on('update_direction', function(para){
             if (para.index!=index) {
-                //HighLog("angle: "+para.newDirection);
                 angles[para.index] = para.newDirection;
-                HighLog(para.index+" angle2: "+angles[para.index]);
             }
         });
 
@@ -425,5 +455,5 @@ function lowLog(msg){
 }
 
 function HighLog(msg){
-    //console.log("High Log: "+ msg);
+    console.log("High Log: "+ msg);
 }
