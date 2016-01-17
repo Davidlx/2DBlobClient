@@ -167,6 +167,9 @@ var GameLayer = cc.Layer.extend({
                         socket.emit('food_eat', index, getUserPosition()[0],getUserPosition()[1],i,getUNIXTimestamp());
                     }
                 }
+            },REFRESH_TIME);
+
+            window.setInterval(function () {
                 for (var i = 0; i < users.length; i++) {
                     if(i!=index && collisionDetection(ball, users[i])){
                         socket.emit('eat_user', index, getUserPosition()[0],getUserPosition()[1],i,getUNIXTimestamp());
