@@ -151,6 +151,7 @@ var GameLayer = cc.Layer.extend({
                 for (var i = 0; i < food_type.length; i++) {
                     //var currentBallScale = ball.getScale();
                     if (collisionDetection(ball, food[i])) {
+                        HighLog("Collision: ball "+getUserPosition()[0]+" "+getUserPosition()[1]+ " food: "+food_posi[i*2]+" "+food_posi[i*2+1]);
                         socket.emit('food_eat', index, getUserPosition()[0],getUserPosition()[1],i,getUNIXTimestamp());
                     }
                 }
