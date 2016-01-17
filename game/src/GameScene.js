@@ -134,13 +134,6 @@ var GameLayer = cc.Layer.extend({
                 }
             }, ball);
 
-            //update speed and angle
-            window.setInterval(function () {
-                ball.angle = calculateAngle(mousePos, ball, angle);
-                ball.speed = 3 * calculateSpeed(mousePos, ball, speed, size);
-                move(ball, ball.angle, ball.speed);
-            }, REFRESH_TIME);
-
             //old users movement
             for(var i=0;i<index;i++){
                 users[i] = new cc.Sprite(res.ball_png);
@@ -149,6 +142,14 @@ var GameLayer = cc.Layer.extend({
                 users[i].setPosition(userPos[i*2],userPos[i*2+1]);
                 map.addChild(users[i],0);
             }
+
+            //update speed and angle
+            window.setInterval(function () {
+                ball.angle = calculateAngle(mousePos, ball, angle);
+                ball.speed = 3 * calculateSpeed(mousePos, ball, speed, size);
+                move(ball, ball.angle, ball.speed);
+            }, REFRESH_TIME);
+
             window.setInterval(function () {
                 for(var i=0;i<index;i++) {
                     otherUsersMove(users[i], angles[i], 3);
