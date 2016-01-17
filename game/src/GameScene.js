@@ -56,14 +56,11 @@ var GameLayer = cc.Layer.extend({
             for(var i=0;i<para.food.length;i+=2){
                 food_posi[i] = para.food[i];
                 food_posi[i+1] = para.food[i+1];
-                console.log(para.food[i]);
                 addFoodOnMap(i/2,para.food[i],para.food[i+1]);
             }
             for(var i=0;i<para.food_type.length;i++){
                 food_type[i] = para.food_type[i];
             }
-
-            console.log(para.food);
         });
 
 
@@ -77,7 +74,6 @@ var GameLayer = cc.Layer.extend({
 
 
             socket.on("User_Add", function(para){
-                console.log(typeof userNames);
                 users[para.index] = new cc.Sprite(res.ball_png);
                 users[para.index].setAnchorPoint(0.5, 0.5);
                 users[para.index].setScale(0.03);
@@ -86,6 +82,7 @@ var GameLayer = cc.Layer.extend({
                 userSpeed.push(0);
                 angles.push(0);
                 map.addChild(users[para.index],0);
+                //new user movement
                 window.setInterval(function () {
                     otherUsersMove(users[para.index], angles[para.index], 3);
                 },REFRESH_TIME);
@@ -144,11 +141,11 @@ var GameLayer = cc.Layer.extend({
                 move(ball, ball.angle, ball.speed);
             }, REFRESH_TIME);
 
-            //other user's movement
+            //old users movement
             for(var i=0;i<index;i++){
                 users[i] = new cc.Sprite(res.ball_png);
                 users[i].setAnchorPoint(0.5, 0.5);
-                users[i].setScale(0.03);
+                users[i].setScale(calculatePlayerScale(users[i],userScore[i]));
                 users[i].setPosition(userPos[i*2],userPos[i*2+1]);
                 map.addChild(users[i],0);
             }
@@ -176,15 +173,16 @@ var GameLayer = cc.Layer.extend({
                 // if the food index and user index matched, then delete,
                 //new scores will be sent to you
                 HighLog("Food Eat Received");
-                if (para.index == index) {
-                    score = para.score;
-                }else{
-                    userScore[para.index] = para.score;
-                }
-                ball.setScale(calculatePlayerScale(ball));
 
-                userName.setFontSize((ballSize / 2) * calculatePlayerScale(ball));
-                HighLog("font size : " + userName.getFontSize() * calculatePlayerScale(userName));
+                userScore[para.index] = para.score;
+                lowLog(para.index +": "+ para.score);
+                if(para.index == index){
+                    ball.setScale(calculatePlayerScale(ball,userScore[index]));
+                    userName.setFontSize((ballSize / 2) * calculatePlayerScale(ball,userScore[index]));
+                }
+                else{
+                    users[para.index].setScale(calculatePlayerScale(users[para.index],userScore[index]));
+                }
                 map.removeChild(food[para.food_index], true);
             });
 
@@ -386,15 +384,14 @@ function calculateSpeedAlgorithm(soucePoint,targetPoint,size){
 }
 
 
-function calculatePlayerScale(player){
+function calculatePlayerScale(player, score){
     var scale;
     if(score<100){
-        scale = player.getScale() + 0.005;
+        scale = 0.03+ score*0.005;
     }
     else{
-        scale = player.getScale() + 0.0005;
+        scale = 0.03+ 100*0.005 + (score-100)*0.0005;
     }
-    //var scale = 0.03*(Math.log(score+1)+1);
     return scale;
 }
 
