@@ -2,6 +2,7 @@ var url = window.location.href;
 console.log(url);
 var socket = io(url);
 var REFRESH_TIME = 10;
+var gameLayer
 var index = 0;
 var size;
 var map;
@@ -29,7 +30,7 @@ var GameLayer = cc.Layer.extend({
         this._super();
 
         socket.emit('user_name','test');
-        var gameLayer=this;
+        gameLayer=this;
         //cc.log("Game init");
          map = new cc.TMXTiledMap(res.map_tmx);
 
@@ -74,17 +75,23 @@ var GameLayer = cc.Layer.extend({
 
 
             socket.on("User_Add", function(para){
+                lowLog("NEW USER ADD: "+para.index);
                 users[para.index] = new cc.Sprite(res.ball_png);
                 users[para.index].setAnchorPoint(0.5, 0.5);
                 users[para.index].setScale(0.025);
                 users[para.index].setPosition(100,100);
-                userNames.push(para.name);
-                userSpeed.push(0);
-                angles.push(0);
+                userStatus[para.index]='running';
+                userNames[para.index]=para.name;
+                userSpeed[para.index]=0;
+                angles[para.index]=0;
                 map.addChild(users[para.index],0);
                 //new user movement
+
                 window.setInterval(function () {
-                    otherUsersMove(users[para.index], angles[para.index], 3);
+                    if(userStatus[para.index]=='running'){
+                        lowLog("new user "+para.index+": "+ userStatus[para.index]);
+                        otherUsersMove(users[para.index], angles[para.index], 3);
+                    }
                 },REFRESH_TIME);
 
             });
@@ -136,13 +143,23 @@ var GameLayer = cc.Layer.extend({
 
             //old users movement
             for(var i=0;i<index;i++){
-                users[i] = new cc.Sprite(res.ball_png);
-                users[i].setAnchorPoint(0.5, 0.5);
-                users[i].setScale(calculatePlayerScale(userScore[i]));
-                users[i].setPosition(userPos[i*2],userPos[i*2+1]);
-                map.addChild(users[i],0);
-
+                if(userStatus[i]=='running'){
+                    users[i] = new cc.Sprite(res.ball_png);
+                    users[i].setAnchorPoint(0.5, 0.5);
+                    users[i].setScale(calculatePlayerScale(userScore[i]));
+                    users[i].setPosition(userPos[i*2],userPos[i*2+1]);
+                    map.addChild(users[i],0);
+                }
             }
+            window.setInterval(function () {
+                for(var i=0;i<index;i++) {
+                    if (userStatus[i]=='running'){
+                        lowLog(i+": "+ userStatus[i]);
+                        otherUsersMove(users[i], angles[i], 3);
+                    }
+
+                }
+            },REFRESH_TIME);
 
             //update speed and angle
             window.setInterval(function () {
@@ -151,11 +168,7 @@ var GameLayer = cc.Layer.extend({
                 move(ball, ball.angle, ball.speed);
             }, REFRESH_TIME);
 
-            window.setInterval(function () {
-                for(var i=0;i<index;i++) {
-                    otherUsersMove(users[i], angles[i], 3);
-                }
-            },REFRESH_TIME);
+
 
 
 
@@ -171,9 +184,12 @@ var GameLayer = cc.Layer.extend({
 
             window.setInterval(function () {
                 for (var i = 0; i < users.length; i++) {
-                    if(i!=index && collisionDetection(ball, users[i])){
-                        socket.emit('eat_user', index, getUserPosition()[0],getUserPosition()[1],i,getUNIXTimestamp());
-                        HighLog("User Collision");
+                    if(i!=index && userStatus[i]=='running') {
+                        if(collisionDetection(ball, users[i])){
+                            socket.emit('eat_user', index, getUserPosition()[0],getUserPosition()[1],i,getUNIXTimestamp());
+                            HighLog("User Collision");
+                        }
+
                     }
                 }
             },REFRESH_TIME);
@@ -211,13 +227,12 @@ var GameLayer = cc.Layer.extend({
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
                 }
                 if(para.user_index==index){
-                    //TODO: game over
-                    lowLog("GAME OVER!");
+                    gameOver();
                 }
                 else{
-                    map.removeChild(users[para.user_index], true);
+                    map.removeChild(users[para.user_index],true);
                 }
-                //TODO: delete user
+
                 users.splice(para.user_index,1);
                 angles.splice(para.user_index,1);
                 userScore.splice(para.user_index,1);
@@ -237,7 +252,6 @@ var GameLayer = cc.Layer.extend({
 
         socket.on('user_index',function(newIndex){
             index = newIndex;
-
         });
 
         socket.on('update_direction', function(para){
@@ -257,12 +271,21 @@ var GameLayer = cc.Layer.extend({
             users[para.index].setPositionY = para.posi_y;
         });
 
-        socket.on('update_status', function(para){
+        socket.on('status_update', function(para){
             userStatus[para.index] = para.status;
         });
 
         socket.on('update_score', function(para){
             users[para.index].score = para.score;
+        });
+
+        socket.on('user_leave', function(para){
+            lowLog("User "+para.index+" has left");
+            userStatus[para.index] = 'not running';
+            map.removeChild(users[para.index],true);
+            if(para.index==index){
+                gameOver();
+            }
         });
 
         }
@@ -395,7 +418,6 @@ function collisionDetection(player, sprite2) {
 }
 
 
-
 function calculateAngle(sourcePoint,targetPoint,angle){//ball - source, mouse - targetpoint
     var tempAngle = (Math.atan2(targetPoint.y-sourcePoint.y,targetPoint.x-sourcePoint.x));
     if (tempAngle != angle) {
@@ -463,4 +485,24 @@ function lowLog(msg){
 
 function HighLog(msg){
     console.log("High Log: "+ msg);
+}
+
+function gameOver(){
+    //TODO: GAME OVER PAGE
+    lowLog("gg");
+    size = cc.director.getWinSize();
+    var info1 = new cc.LabelTTF("GAME OVER", "Arial");
+    info1.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+    info1.setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+    info1.setFontSize(100);
+    info1.setPosition(size.width/2,size.height/2-100);
+    info1.setColor(cc.color(0, 0, 100));
+    gameLayer.addChild(info1, 0);
+    var info2 = new cc.LabelTTF("We are sorry but the game over page is still under construction \n Please refresh the website to reconnect.", "Arial");
+    info2.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+    info2.setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+    info2.setFontSize(30);
+    info2.setPosition(size.width/2,size.height/2+100);
+    info2.setColor(cc.color(0, 0, 100));
+    gameLayer.addChild(info2, 0);
 }
