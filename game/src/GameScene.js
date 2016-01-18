@@ -154,7 +154,7 @@ var GameLayer = cc.Layer.extend({
             window.setInterval(function () {
                 for(var i=0;i<index;i++) {
                     if (userStatus[i]=='running'){
-                        lowLog(i+": "+ userStatus[i]);
+                        //lowLog(i+": "+ userStatus[i]);
                         otherUsersMove(users[i], angles[i], 3);
                     }
 
@@ -222,14 +222,12 @@ var GameLayer = cc.Layer.extend({
                     ball.setScale(calculatePlayerScale(userScore[para.index]));
                     userName.setFontSize((ballSize / 2) * calculatePlayerScale(userScore[index]));
                     lowLog("YOU HAVE EATEN A USER!");
-                }
-                else{
+                }else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
                 }
                 if(para.user_index==index){
                     gameOver();
-                }
-                else{
+                }else{
                     map.removeChild(users[para.user_index],true);
                 }
 
@@ -280,11 +278,13 @@ var GameLayer = cc.Layer.extend({
         });
 
         socket.on('user_leave', function(para){
-            lowLog("User "+para.index+" has left");
+            lowLog("User "+para.index+" has left 281");
             userStatus[para.index] = 'not running';
             map.removeChild(users[para.index],true);
             if(para.index==index){
                 gameOver();
+            }else{
+                    map.removeChild(users[para.user_index],true);
             }
         });
 
