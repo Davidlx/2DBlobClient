@@ -10,6 +10,7 @@ var ballSize;
 var score;
 var food = [];
 var userName;
+var scoreBox;
 var mousePos;
 var map_userSpawnPosX=0;
 var map_userSpawnPosY=0;
@@ -128,11 +129,19 @@ var GameLayer = cc.Layer.extend({
             userName.setColor(cc.color(0, 0, 0));
             gameLayer.addChild(userName, 0);
 
+            scoreBox = new cc.Sprite(res.scoreBox_png);
+            scoreBox.setPosition(size.width - 180, 70);
+            gameLayer.addChild(scoreBox);
 
             var REGULAR_UPDATES_RATE = 100;
             var speed = 0;
             var angle = 0;
-            score = 0;
+            score = 5;
+
+            var scoreLabel = new cc.LabelTTF("Score : " + score, "Arial");
+            scoreLabel.setPosition(size.width - 180, 70);
+            gameLayer.addChild(scoreLabel);
+
             cc.eventManager.addListener({
                 event: cc.EventListener.MOUSE,
                 onMouseMove: function (event) {
@@ -204,6 +213,7 @@ var GameLayer = cc.Layer.extend({
                 if(para.index == index){
                     ball.setScale(calculatePlayerScale(userScore[index]));
                     userName.setFontSize((ballSize / 2) * calculatePlayerScale(userScore[index]));
+                    scoreLabel.setString("Score: " + para.score);
                 }
                 else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
