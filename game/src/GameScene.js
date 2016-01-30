@@ -288,6 +288,10 @@ var GameLayer = cc.Layer.extend({
             }
         });
 
+        socket.on('timeLag', function(para){
+            lowLog("Network Time Lag:"+para.time+" 毫秒");
+        });
+
         }
 
 
