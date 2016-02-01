@@ -363,13 +363,13 @@ function otherUsersMove(ball, angle, speed){
     var isDown = true;
     var sin = Math.sin(angle);
     var cos = Math.cos(angle);
-    if(ball.x<0) isLeft = false;
+    if(ball.x<10) isLeft = false;
     else isLeft = true;
-    if(ball.x>map.width) isRight = false;
+    if(ball.x>map.width-10) isRight = false;
     else isRight = true;
-    if(ball.y<0) isDown = false;
+    if(ball.y<10) isDown = false;
     else isDown = true;
-    if(ball.y>map.height) isUp = false;
+    if(ball.y>map.height-10) isUp = false;
     else isUp = true;
 
     if(cos<0){
