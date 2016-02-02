@@ -218,13 +218,6 @@ var GameLayer = cc.Layer.extend({
                     ball.setScale(calculatePlayerScale(userScore[index]));
                     userName.setFontSize((ballSize / 2) * calculatePlayerScale(userScore[index]));
                     scoreLabel.setString("Score: " + para.score);
-
-                    //to test game over scene
-                    if(para.score == 6)
-                    {
-                        stop = true;
-                        gameOver(para.score);
-                    }
                 }
                 else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
@@ -546,4 +539,3 @@ function gameOver(score){
 
     cc.eventManager.removeAllListeners();
 }
-
