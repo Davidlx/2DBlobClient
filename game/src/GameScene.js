@@ -1,7 +1,7 @@
 var url = window.location.href;
 console.log(url);
 var socket = io(url);
-var REFRESH_TIME = 10;
+var REFRESH_TIME = 15;
 var gameLayer
 var index = 0;
 var size;
@@ -9,8 +9,6 @@ var map;
 var ballSize;
 var score;
 var food = [];
-var userName;
-var scoreBox;
 var mousePos;
 var map_userSpawnPosX=0;
 var map_userSpawnPosY=0;
@@ -25,6 +23,11 @@ var userPos = [];
 var angles = [];
 var food_posi = [];
 var food_type = [];
+
+var userName;
+var scoreBox;
+var network = 1000;
+var networkLable;
 
 var GameLayer = cc.Layer.extend({
 
@@ -142,6 +145,10 @@ var GameLayer = cc.Layer.extend({
             var scoreLabel = new cc.LabelTTF("Score : " + score, "Arial");
             scoreLabel.setPosition(size.width - 180, 70);
             gameLayer.addChild(scoreLabel);
+
+            networkLable = new cc.LabelTTF("Network Delay : " + network, "Arial");
+            networkLable.setPosition(size.width - 180, 50);
+            gameLayer.addChild(networkLable);
 
             cc.eventManager.addListener({
                 event: cc.EventListener.MOUSE,
@@ -300,6 +307,12 @@ var GameLayer = cc.Layer.extend({
             }else{
                     map.removeChild(users[para.user_index],true);
             }
+        });
+
+        socket.on('timeLag', function(para){
+          lowLog("Sending Time: "+para.sendingTime+" Receive Time "+para.currentTime+" Current Time: "+getUNIXTimestamp());
+          network = getUNIXTimestamp() - para.sendingTime;
+          networkLable.setString("Network Delay : " + network);
         });
 
         }
