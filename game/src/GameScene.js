@@ -214,6 +214,13 @@ var GameLayer = cc.Layer.extend({
                     ball.setScale(calculatePlayerScale(userScore[index]));
                     userName.setFontSize((ballSize / 2) * calculatePlayerScale(userScore[index]));
                     scoreLabel.setString("Score: " + para.score);
+
+                    //to test game over scene
+                    if(para.score == 6)
+                    {
+                        gameOver(para.score);
+                        move(ball,0,0);
+                    }
                 }
                 else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
@@ -236,7 +243,7 @@ var GameLayer = cc.Layer.extend({
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
                 }
                 if(para.user_index==index){
-                    gameOver();
+                    gameOver(para.score);
                 }else{
                     map.removeChild(users[para.user_index],true);
                 }
@@ -292,7 +299,7 @@ var GameLayer = cc.Layer.extend({
             userStatus[para.index] = 'not running';
             map.removeChild(users[para.index],true);
             if(para.index==index){
-                gameOver();
+                gameOver(para.score);
             }else{
                     map.removeChild(users[para.user_index],true);
             }
@@ -497,7 +504,7 @@ function HighLog(msg){
     console.log("High Log: "+ msg);
 }
 
-function gameOver(){
+/*function gameOver(){
     //TODO: GAME OVER PAGE
     lowLog("gg");
     size = cc.director.getWinSize();
@@ -515,4 +522,24 @@ function gameOver(){
     info2.setPosition(size.width/2,size.height/2+100);
     info2.setColor(cc.color(0, 0, 100));
     gameLayer.addChild(info2, 0);
+}*/
+
+function gameOver(score){
+    var bg = new cc.Sprite(res.blackBG_png);
+
+    bg.setPosition(size.width / 2, size.height / 2);
+    gameLayer.addChild(bg, 0);
+
+    var box = new cc.Sprite(res.gameoverBox_png);
+    box.setPosition(size.width/2, size.height/2);
+    gameLayer.addChild(box, 0);
+
+    var scoreLabel = new cc.LabelTTF("Score : " + score, "Arial");
+    scoreLabel.setPosition(size.width/2, size.height/2);
+    scoreLabel.setFontSize(36);
+    scoreLabel.setColor(0,0,0);
+    gameLayer.addChild(scoreLabel);
+
+    cc.eventManager.removeAllListeners();
 }
+

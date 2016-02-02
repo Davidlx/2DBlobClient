@@ -19,7 +19,9 @@ var res = {
     home_down_png: "res/home_down.png",
     about_bg_png : "res/about_bg.png",
     title_png:"res/title.png",
-    scoreBox_png:"res/scoreBox.png"
+    scoreBox_png:"res/scoreBox.png",
+    blackBG_png:"res/blackBG.png",
+    gameoverBox_png:"res/gameoverBox.png"
 };
 
 var g_resources = [];
