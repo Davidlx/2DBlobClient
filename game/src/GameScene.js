@@ -14,6 +14,7 @@ var scoreBox;
 var mousePos;
 var map_userSpawnPosX=0;
 var map_userSpawnPosY=0;
+var stop = false;
 
 var users = new Array();
 var userNames = [];
@@ -172,9 +173,12 @@ var GameLayer = cc.Layer.extend({
 
             //update speed and angle
             window.setInterval(function () {
-                ball.angle = calculateAngle(mousePos, ball, angle);
-                ball.speed = 3 * calculateSpeed(mousePos, ball, speed, size);
-                move(ball, ball.angle, ball.speed);
+                if(stop){move(ball,0,0);}
+                else {
+                    ball.angle = calculateAngle(mousePos, ball, angle);
+                    ball.speed = 3 * calculateSpeed(mousePos, ball, speed, size);
+                    move(ball, ball.angle, ball.speed);
+                }
             }, REFRESH_TIME);
 
 
@@ -218,8 +222,8 @@ var GameLayer = cc.Layer.extend({
                     //to test game over scene
                     if(para.score == 6)
                     {
+                        stop = true;
                         gameOver(para.score);
-                        move(ball,0,0);
                     }
                 }
                 else{
