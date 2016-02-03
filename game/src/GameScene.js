@@ -194,6 +194,7 @@ var GameLayer = cc.Layer.extend({
                     if (collisionDetection(ball, food[i])) {
                         //HighLog("Collision: ball "+getUserPosition()[0]+" "+getUserPosition()[1]+ " food: "+food_posi[i*2]+" "+food_posi[i*2+1]);
                         socket.emit('food_eat', index, getUserPosition()[0],getUserPosition()[1],i,getUNIXTimestamp());
+                        map.removeChild(food[i], true);
                     }
                 }
             },REFRESH_TIME);
@@ -225,7 +226,6 @@ var GameLayer = cc.Layer.extend({
                 else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
                 }
-                map.removeChild(food[para.food_index], true);
             });
 
             socket.on('user_eat_succ', function(para){
