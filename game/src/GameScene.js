@@ -282,8 +282,8 @@ var GameLayer = cc.Layer.extend({
         });
 
         socket.on('update_position', function(para){
-            users[para.index].setPositionX = para.posi_x;
-            users[para.index].setPositionY = para.posi_y;
+            users[para.index].setPositionX(para.posi_x);
+            users[para.index].setPositionY(para.posi_y);
         });
 
         socket.on('status_update', function(para){
@@ -292,6 +292,17 @@ var GameLayer = cc.Layer.extend({
 
         socket.on('update_score', function(para){
             users[para.index].score = para.score;
+        });
+
+        socket.on('updateAllUserLocation', function(para){
+            HighLog("Update All Pos Received");
+            for(var i=0; i<para.position.length; i+=2){
+                if(i/2!=index){
+                    users[i/2].x = para.position[i];
+                    users[i/2].y = para.position[i+1];
+                    HighLog("Update All Pos Proceed: "+i + " X: "+ users[i/2].x+  " Y: "+ users[i/2].y);
+                }
+            }
         });
 
         socket.on('user_leave', function(para){
@@ -304,6 +315,7 @@ var GameLayer = cc.Layer.extend({
                     map.removeChild(users[para.user_index],true);
             }
         });
+
 
         socket.on('timeLag', function(para){
           lowLog("Sending Time: "+para.sendingTime+" Receive Time "+para.currentTime+" Current Time: "+getUNIXTimestamp());
@@ -513,7 +525,7 @@ function getUNIXTimestamp(){
 }
 
 function lowLog(msg){
-    console.log("Low Log: "+ msg);
+    //console.log("Low Log: "+ msg);
 }
 
 function HighLog(msg){
