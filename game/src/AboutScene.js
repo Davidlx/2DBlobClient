@@ -50,7 +50,7 @@ var AboutLayer = cc.Layer.extend({
             "res/home_down.png",
             function () {
                 cc.log("homeMenuItem is clicked!");
-                cc.director.runScene(new app());
+                cc.director.runScene(new cc.TransitionFade(1.2,new HelloWorldScene()));
             }, this);
         homeMenuItem.x = size.width / 2+350;
         homeMenuItem.y = 580;
