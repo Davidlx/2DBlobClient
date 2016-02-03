@@ -183,14 +183,10 @@ var GameLayer = cc.Layer.extend({
                 if(stop){move(ball,0,0);}
                 else {
                     ball.angle = calculateAngle(mousePos, ball, angle);
-                    ball.speed = 3 * calculateSpeed(mousePos, ball, speed, size);
+                    ball.speed = calculateSpeed(mousePos, ball, ball.speed, size);
                     move(ball, ball.angle, ball.speed);
                 }
             }, REFRESH_TIME);
-
-
-
-
 
             //collision detection
             window.setInterval(function () {
@@ -469,7 +465,7 @@ function calculateSpeedAlgorithm(soucePoint,targetPoint,size){
     var y = (targetPoint.y-soucePoint.y)*(targetPoint.y-soucePoint.y);
 
     var distance = Math.sqrt(x+y);
-    return 1;
+    return 3;
 }
 
 
