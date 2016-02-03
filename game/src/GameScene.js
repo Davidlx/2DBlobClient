@@ -146,7 +146,7 @@ var GameLayer = cc.Layer.extend({
             scoreLabel.setPosition(size.width - 180, 70);
             gameLayer.addChild(scoreLabel);
 
-            networkLable = new cc.LabelTTF("Network Delay : " + network, "Arial");
+            networkLable = new cc.LabelTTF("Network Status : Excellent", "Arial");
             networkLable.setPosition(size.width - 180, 50);
             gameLayer.addChild(networkLable);
 
@@ -308,7 +308,17 @@ var GameLayer = cc.Layer.extend({
         socket.on('timeLag', function(para){
           lowLog("Sending Time: "+para.sendingTime+" Receive Time "+para.currentTime+" Current Time: "+getUNIXTimestamp());
           network = getUNIXTimestamp() - para.sendingTime;
-          networkLable.setString("Network Delay : " + network);
+          var message = "";
+          if (network <=50) {
+            message = "Excellent";
+          }else if (50<network&&network<=80) {
+            message = "Good";
+          }else if (80<network&&network<=100) {
+            message = "Ok";
+          }else{
+            message = "bad";
+          }
+          networkLable.setString("Network Status : " + message);
         });
 
         }
