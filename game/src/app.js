@@ -28,7 +28,7 @@ var HelloWorldLayer = cc.Layer.extend({
             "res/start_down.png",
             function () {
                 cc.log("startMenuItem is clicked!");
-                cc.director.pushScene(new GameScene());
+                cc.director.pushScene(new cc.TransitionFade(1.2,new GameScene()));
             }, this);
         startMenuItem.x = size.width / 2;
         startMenuItem.y = size.height - 500;
@@ -39,7 +39,7 @@ var HelloWorldLayer = cc.Layer.extend({
             "res/about_down.png",
             function () {
                 cc.log("aboutMenuItem is clicked!");
-                cc.director.pushScene(cc.Scene(new AboutScene()));
+                cc.director.runScene(new cc.TransitionFade(1.2,new AboutScene()));
             }, this);
         aboutMenuItem.x = size.width / 2 + 165;
         aboutMenuItem.y = size.height - 450;
