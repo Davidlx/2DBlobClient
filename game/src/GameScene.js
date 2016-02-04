@@ -330,7 +330,7 @@ var GameLayer = cc.Layer.extend({
           }else{
             message = "bad";
           }
-          networkLable.setString("Network Status : " + message);
+          networkLable.setString("Network Status : " + message+" "+network);
         });
 
         }
