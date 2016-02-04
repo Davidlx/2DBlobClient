@@ -33,21 +33,6 @@ var GameLayer = cc.Layer.extend({
 
         ctor: function(){
         this._super();
-        
-        var homeMenuItem = new cc.MenuItemImage(
-            "res/home.png",
-            "res/home_down.png",
-            function () {
-                cc.log("homeMenuItem is clicked!");
-                cc.director.runScene(new cc.TransitionFade(1.2,new HelloWorldScene()));
-            }, this);
-        homeMenuItem.x = size.width / 2-400;
-        homeMenuItem.y = 580;
-
-        var mu = new cc.Menu(homeMenuItem);
-        mu.x = 0;
-        mu.y = 0;
-        this.addChild(mu);
 
         socket.emit('user_name','test');
         gameLayer=this;
@@ -348,10 +333,7 @@ var GameLayer = cc.Layer.extend({
           networkLable.setString("Network Status : " + message);
         });
 
-        },
-        menuItemAboutCallback: function (sender) {
-        cc.log("menuItemHomeCallback!");
-    }
+        }
 
 
     /*
