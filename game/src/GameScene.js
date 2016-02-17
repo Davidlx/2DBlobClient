@@ -2,6 +2,7 @@ var url = window.location.href;
 console.log(url);
 var socket = io(url);
 var REFRESH_TIME = 15;
+var INITIAL_SCORE = 5;
 var gameLayer
 var index = 0;
 var size;
@@ -16,6 +17,7 @@ var stop = false;
 
 var users = new Array();
 var userNames = [];
+var userLabels = [];
 var userSpeed = [];
 var userScore = [];
 var userStatus = [];
@@ -90,12 +92,21 @@ var GameLayer = cc.Layer.extend({
                 userSpeed[para.index]=0;
                 angles[para.index]=0;
                 map.addChild(users[para.index],0);
+
+                userLabels[para.index] = new cc.LabelTTF("PH", "Arial");
+                userLabels[para.index].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+                userLabels[para.index].setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+                userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(INITIAL_SCORE));
+                userLabels[para.index].setPosition(users[para.index].x, users[para.index].y);
+                userLabels[para.index].setColor(cc.color(0, 0, 0));
+                map.addChild(userLabels[para.index], 0);
                 //new user movement
 
                 window.setInterval(function () {
                     if(userStatus[para.index]=='running'){
                         lowLog("new user "+para.index+": "+ userStatus[para.index]);
                         otherUsersMove(users[para.index], angles[para.index], 3);
+                        userLabels[para.index].setPosition(users[para.index].x, users[para.index].y);
                     }
                 },REFRESH_TIME);
 
@@ -125,13 +136,13 @@ var GameLayer = cc.Layer.extend({
             ball.setScale(0.025);
             gameLayer.addChild(ball, 0);
 
-            userName = new cc.LabelTTF("test", "Arial");
-            userName.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-            userName.setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-            userName.setFontSize(ballSize / 2 * ball.getScale());
-            userName.setPosition(cc.p(ball.getPositionX(), ball.getPositionY()));
-            userName.setColor(cc.color(0, 0, 0));
-            gameLayer.addChild(userName, 0);
+            userLabels[index] = new cc.LabelTTF("You", "Arial");
+            userLabels[index].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+            userLabels[index].setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+            userLabels[index].setFontSize(ballSize / 2 * ball.getScale());
+            userLabels[index].setPosition(cc.p(ball.getPositionX(), ball.getPositionY()));
+            userLabels[index].setColor(cc.color(0, 0, 0));
+            gameLayer.addChild(userLabels[index], 0);
 
             scoreBox = new cc.Sprite(res.scoreBox_png);
             scoreBox.setPosition(size.width - 180, 70);
@@ -158,7 +169,9 @@ var GameLayer = cc.Layer.extend({
                 }
             }, ball);
 
-            //old users movement
+
+
+            //old users ball
             for(var i=0;i<index;i++){
                 if(userStatus[i]=='running'){
                     users[i] = new cc.Sprite(res.ball_png);
@@ -168,11 +181,25 @@ var GameLayer = cc.Layer.extend({
                     map.addChild(users[i],0);
                 }
             }
+            //old users label
+            for(var i=0; i<userNames.length; i++){
+                if(i!=index){
+                    userLabels[i] = new cc.LabelTTF("PH", "Arial");
+                    userLabels[i].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+                    userLabels[i].setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+                    userLabels[i].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[i]));
+                    userLabels[i].setPosition(users[i].x, users[i].y);
+                    userLabels[i].setColor(cc.color(0, 0, 0));
+                    map.addChild(userLabels[i], 0);
+                }
+            }
+            //old users movement
             window.setInterval(function () {
                 for(var i=0;i<index;i++) {
                     if (userStatus[i]=='running'){
                         //lowLog(i+": "+ userStatus[i]);
                         otherUsersMove(users[i], angles[i], 3);
+                        userLabels[i].setPosition(users[i].x, users[i].y);
                     }
 
                 }
@@ -216,15 +243,16 @@ var GameLayer = cc.Layer.extend({
                 // if the food index and user index matched, then delete,
                 //new scores will be sent to you
                 HighLog("Food Eat Received");
-
+                map.removeChild(food[para.food_index], true);
                 userScore[para.index] = para.score;
                 if(para.index == index){
                     ball.setScale(calculatePlayerScale(userScore[index]));
-                    userName.setFontSize((ballSize / 2) * calculatePlayerScale(userScore[index]));
+                    userLabels[index].setFontSize((ballSize / 2) * calculatePlayerScale(userScore[index]));
                     scoreLabel.setString("Score: " + para.score);
                 }
                 else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
+                    userLabels[para.index].setFontSize((ballSize / 2) * calculatePlayerScale(userScore[para.index]));
                 }
             });
 
@@ -237,15 +265,17 @@ var GameLayer = cc.Layer.extend({
                 userScore[para.index] = para.score;
                 if(para.index == index){
                     ball.setScale(calculatePlayerScale(userScore[para.index]));
-                    userName.setFontSize((ballSize / 2) * calculatePlayerScale(userScore[index]));
+                    userLabels[index].setFontSize((ballSize / 2) * calculatePlayerScale(userScore[index]));
                     lowLog("YOU HAVE EATEN A USER!");
                 }else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
+                    userLabels[para.index].setFontSize((ballSize / 2) * calculatePlayerScale(userScore[para.index]));
                 }
                 if(para.user_index==index){
                     gameOver(para.score);
                 }else{
                     map.removeChild(users[para.user_index],true);
+                    map.removeChild(userLabels[para.user_index],true);
                 }
 
                 users.splice(para.user_index,1);
@@ -562,7 +592,7 @@ function gameOver(score){
     box.setPosition(size.width/2, size.height/2);
     gameLayer.addChild(box, 0);
 
-    var scoreLabel = new cc.LabelTTF("Score : " + score, "Arial");
+    var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Arial");
     scoreLabel.setPosition(size.width/2, size.height/2);
     scoreLabel.setFontSize(36);
     scoreLabel.setColor(0,0,0);
