@@ -588,15 +588,37 @@ function gameOver(score){
     bg.setPosition(size.width / 2, size.height / 2);
     gameLayer.addChild(bg, 0);
 
+    var fade_action = cc.fadeIn(2);
+
     var box = new cc.Sprite(res.gameoverBox_png);
     box.setPosition(size.width/2, size.height/2);
     gameLayer.addChild(box, 0);
+    box.setOpacity(0);
+    box.runAction(fade_action);
 
     var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Arial");
-    scoreLabel.setPosition(size.width/2, size.height/2);
+    scoreLabel.setPosition(size.width/2 + 10, size.height/2 + 40);
     scoreLabel.setFontSize(36);
     scoreLabel.setColor(0,0,0);
     gameLayer.addChild(scoreLabel);
+
+    var label1 = new cc.LabelTTF("Did you enjoy the game?", "Arial");
+    label1.setPosition(size.width/2 + 10, size.height/2 - 20);
+    label1.setFontSize(20);
+    label1.setColor(0,0,0);
+    gameLayer.addChild(label1);
+
+    var label2 = new cc.LabelTTF("Please fill in our questionnaire to help us make the game better!", "Arial");
+    label2.setPosition(size.width/2 + 10, size.height/2 - 60);
+    label2.setFontSize(18);
+    label2.setColor(0,0,0);
+    gameLayer.addChild(label2);
+
+    var url = new cc.LabelTTF("http://tp.sojump.cn/jq/7123174.aspx", "Arial");
+    url.setPosition(size.width/2 + 10, size.height/2 - 80);
+    url.setFontSize(16);
+    url.setColor(100,0,0);
+    gameLayer.addChild(url);
 
     cc.eventManager.removeAllListeners();
 }
