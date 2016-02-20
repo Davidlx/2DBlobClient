@@ -326,7 +326,7 @@ var GameLayer = cc.Layer.extend({
 
         socket.on('updateAllUserLocation', function(para){
             HighLog("Update All Pos Received");
-            console.log(para);
+            console.log(para.position);
             for(var i=0; i<para.position.length; i+=2){
                 if(i/2!=index){
                     users[i/2].x = para.position[i];
