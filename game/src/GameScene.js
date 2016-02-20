@@ -590,7 +590,7 @@ function gameOver(score){
 
     var fade_action = cc.fadeIn(2);
 
-    var box = new cc.Sprite(res.gameoverBox_png);
+    var box = new cc.Sprite(res.game_over_png);
     //box.setScale(2);
     box.setPosition(size.width/2, size.height/2);
     gameLayer.addChild(box, 0);
@@ -603,10 +603,18 @@ function gameOver(score){
     scoreLabel.setColor(0,0,0);
     gameLayer.addChild(scoreLabel);
 
-    var continueButton = new cc.Sprite(res.continue_png);
-    continueButton.setScale(0.125);
-    continueButton.setPosition(size.width/2, size.height/2 + 80);
-    gameLayer.addChild(continueButton, 0);
+    var restartLabel = new cc.LabelTTF("Try again", "Verdana");
+    restartLabel.setPosition(size.width/2 - 40, size.height/2 + 40);
+    restartLabel.setFontSize(18);
+    restartLabel.setColor(0,0,0);
+    gameLayer.addChild(restartLabel);
+
+    var exitLabel = new cc.LabelTTF("Exit", "Verdana");
+    exitLabel.setPosition(size.width/2 + 40, size.height/2 + 40);
+    exitLabel.setFontSize(18);
+    exitLabel.setColor(0,0,0);
+    gameLayer.addChild(exitLabel);
+
 
     /*
      var continueMenuItem = new cc.MenuItemImage(

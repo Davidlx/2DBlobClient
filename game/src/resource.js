@@ -21,7 +21,7 @@ var res = {
     title_png:"res/title.png",
     scoreBox_png:"res/scoreBox.png",
     blackBG_png:"res/blackBG.png",
-    gameoverBox_png:"res/gameoverBox.png",
+    game_over_png:"res/game_over.png",
     continue_png:"res/continue.png"
 };
 
