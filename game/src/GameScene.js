@@ -173,11 +173,12 @@ var GameLayer = cc.Layer.extend({
 
             //old users ball
             for(var i=0;i<index;i++){
+              users[i] = new cc.Sprite(res.ball_png);
+              users[i].setAnchorPoint(0.5, 0.5);
+              users[i].setScale(0);
+              users[i].setPosition(userPos[i*2],userPos[i*2+1]);
                 if(userStatus[i]=='running'){
-                    users[i] = new cc.Sprite(res.ball_png);
-                    users[i].setAnchorPoint(0.5, 0.5);
-                    users[i].setScale(calculatePlayerScale(userScore[i]));
-                    users[i].setPosition(userPos[i*2],userPos[i*2+1]);
+
                     map.addChild(users[i],0);
                 }
             }
