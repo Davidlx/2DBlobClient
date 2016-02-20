@@ -191,7 +191,11 @@ var GameLayer = cc.Layer.extend({
                     userLabels[i].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[i]));
                     userLabels[i].setPosition(users[i].x, users[i].y);
                     userLabels[i].setColor(cc.color(0, 0, 0));
-                    map.addChild(userLabels[i], 0);
+                    if(userStatus[i]=='running'){
+
+                        map.addChild(userLabels[i], 0);
+                    }
+
                 }
             }
             //old users movement
