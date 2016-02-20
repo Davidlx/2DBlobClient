@@ -591,28 +591,40 @@ function gameOver(score){
     var fade_action = cc.fadeIn(2);
 
     var box = new cc.Sprite(res.gameoverBox_png);
+    //box.setScale(2);
     box.setPosition(size.width/2, size.height/2);
     gameLayer.addChild(box, 0);
     box.setOpacity(0);
     box.runAction(fade_action);
 
-    var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Arial");
+    var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Verdana");
     scoreLabel.setPosition(size.width/2 + 10, size.height/2 + 40);
     scoreLabel.setFontSize(36);
     scoreLabel.setColor(0,0,0);
     gameLayer.addChild(scoreLabel);
 
-    var label1 = new cc.LabelTTF("Did you enjoy the game?", "Arial");
-    label1.setPosition(size.width/2 + 10, size.height/2 - 20);
-    label1.setFontSize(20);
-    label1.setColor(0,0,0);
-    gameLayer.addChild(label1);
+    var continueButton = new cc.Sprite(res.continue_png);
+    continueButton.setScale(0.125);
+    continueButton.setPosition(size.width/2, size.height/2 + 80);
+    gameLayer.addChild(continueButton, 0);
 
-    var label2 = new cc.LabelTTF("Please fill in our questionnaire to help us make the game better!", "Arial");
-    label2.setPosition(size.width/2 + 10, size.height/2 - 60);
-    label2.setFontSize(18);
-    label2.setColor(0,0,0);
-    gameLayer.addChild(label2);
+    /*
+     var continueMenuItem = new cc.MenuItemImage(
+        "res/continue_up.png",
+        "res/continue_down.png",
+         function () {
+            cc.log("continueMenuItem is clicked!");
+            cc.director.pushScene(new cc.TransitionFade(1.2,new GameScene()));
+         }, this);
+         continueMenuItem.x = size.width / 2;
+         continueMenuItem.y = size.height - 300;
+     */
+
+    var label = new cc.LabelTTF("Please fill in our questionnaire to help us make the game better!", "Verdana");
+    label.setPosition(size.width/2 + 10, size.height/2 - 60);
+    label.setFontSize(18);
+    label.setColor(65,105,225);
+    gameLayer.addChild(label);
 
     var url = new cc.LabelTTF("http://tp.sojump.cn/jq/7123174.aspx", "Arial");
     url.setPosition(size.width/2 + 10, size.height/2 - 80);
