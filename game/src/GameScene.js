@@ -148,7 +148,7 @@ var GameLayer = cc.Layer.extend({
             scoreBox.setPosition(size.width - 180, 70);
             gameLayer.addChild(scoreBox);
 
-            var REGULAR_UPDATES_RATE = 100;
+            var REGULAR_UPDATES_RATE = 15;
             var speed = 0;
             var angle = 0;
             score = 5;
@@ -175,7 +175,7 @@ var GameLayer = cc.Layer.extend({
             for(var i=0;i<index;i++){
               users[i] = new cc.Sprite(res.ball_png);
               users[i].setAnchorPoint(0.5, 0.5);
-              users[i].setScale(0);
+              users[i].setScale(calculatePlayerScale(userScore[i]));
               users[i].setPosition(userPos[i*2],userPos[i*2+1]);
                 if(userStatus[i]=='running'){
 
