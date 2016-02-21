@@ -501,20 +501,20 @@ function collisionDetection(player, sprite2) {
 
 function calculateAngle(sourcePoint,targetPoint,angle){//ball - source, mouse - targetpoint
     var tempAngle = (Math.atan2(targetPoint.y-sourcePoint.y,targetPoint.x-sourcePoint.x));
-    if (tempAngle != angle) {
-        //upload server - angle changed
-        //console.log("angle changed");
-        socket.emit('update_user_direction',index,getUserPosition()[0],getUserPosition()[1],tempAngle,getUNIXTimestamp());
-    }
+    // if (tempAngle != angle) {
+    //     //upload server - angle changed
+    //     //console.log("angle changed");
+    //     socket.emit('update_user_direction',index,getUserPosition()[0],getUserPosition()[1],tempAngle,getUNIXTimestamp());
+    // }
     return tempAngle;
 }
 
 function calculateSpeed(sourcePoint,targetPoint,speed,size){//ball - source, mouse - targetpoint
     var tempSpeed = calculateSpeedAlgorithm(sourcePoint,targetPoint,size);
-    if (tempSpeed != speed) {
-        speed = tempSpeed;
-        socket.emit('update_user_speed',index,getUserPosition()[0],getUserPosition()[1],tempSpeed,getUNIXTimestamp());
-    }
+    // if (tempSpeed != speed) {
+    //     speed = tempSpeed;
+    //     socket.emit('update_user_speed',index,getUserPosition()[0],getUserPosition()[1],tempSpeed,getUNIXTimestamp());
+    // }
     return tempSpeed;
 }
 
