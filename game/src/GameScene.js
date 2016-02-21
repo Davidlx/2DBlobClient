@@ -103,13 +103,13 @@ var GameLayer = cc.Layer.extend({
                 map.addChild(userLabels[para.index], 0);
                 //new user movement
 
-                window.setInterval(function () {
-                    if(userStatus[para.index]=='running'){
-                        lowLog("new user "+para.index+": "+ userStatus[para.index]);
-                        otherUsersMove(users[para.index], angles[para.index], 3);
-                        userLabels[para.index].setPosition(users[para.index].x, users[para.index].y);
-                    }
-                },REFRESH_TIME);
+                //window.setInterval(function () {
+                //    if(userStatus[para.index]=='running'){
+                //        lowLog("new user "+para.index+": "+ userStatus[para.index]);
+                //        otherUsersMove(users[para.index], angles[para.index], 3);
+                //        userLabels[para.index].setPosition(users[para.index].x, users[para.index].y);
+                //    }
+                //},REFRESH_TIME);
 
             });
 
@@ -200,16 +200,16 @@ var GameLayer = cc.Layer.extend({
                 }
             }
             //old users movement
-            window.setInterval(function () {
-                for(var i=0;i<index;i++) {
-                    if (userStatus[i]=='running'){
-                        //lowLog(i+": "+ userStatus[i]);
-                        otherUsersMove(users[i], angles[i], 3);
-                        userLabels[i].setPosition(users[i].x, users[i].y);
-                    }
-
-                }
-            },REFRESH_TIME);
+            //window.setInterval(function () {
+            //    for(var i=0;i<index;i++) {
+            //        if (userStatus[i]=='running'){
+            //            //lowLog(i+": "+ userStatus[i]);
+            //            otherUsersMove(users[i], angles[i], 3);
+            //            userLabels[i].setPosition(users[i].x, users[i].y);
+            //        }
+            //
+            //    }
+            //},REFRESH_TIME);
 
             //update speed and angle
             window.setInterval(function () {
@@ -318,10 +318,10 @@ var GameLayer = cc.Layer.extend({
             }
         });
 
-        socket.on('update_position', function(para){
-            users[para.index].setPositionX(para.posi_x);
-            users[para.index].setPositionY(para.posi_y);
-        });
+        //socket.on('update_position', function(para){
+        //    users[para.index].setPositionX(para.posi_x);
+        //    users[para.index].setPositionY(para.posi_y);
+        //});
 
         socket.on('status_update', function(para){
             userStatus[para.index] = para.status;
@@ -340,6 +340,8 @@ var GameLayer = cc.Layer.extend({
                     if(i/2!=index){
                         users[i/2].x = para.position[i];
                         users[i/2].y = para.position[i+1];
+                        userLabels[i/2].x = para.position[i];
+                        userLabels[i/2].y = para.position[i+1];
                         HighLog("Update All Pos Proceed: "+i + " X: "+ users[i/2].x+  " Y: "+ users[i/2].y);
                     }
                 }
