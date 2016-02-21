@@ -304,11 +304,11 @@ var GameLayer = cc.Layer.extend({
             index = newIndex;
         });
 
-        socket.on('update_direction', function(para){
-            if (para.index!=index) {
-                angles[para.index] = para.newDirection;
-            }
-        });
+        //socket.on('update_direction', function(para){
+        //    if (para.index!=index) {
+        //        angles[para.index] = para.newDirection;
+        //    }
+        //});
 
         socket.on('update_speed', function(para){
             if (para.index!=index) {
@@ -345,10 +345,12 @@ var GameLayer = cc.Layer.extend({
             lowLog("User "+para.index+" has left 281");
             userStatus[para.index] = 'not running';
             map.removeChild(users[para.index],true);
+            map.removeChild(userLabels[para.index],true);
             if(para.index==index){
                 gameOver(para.score);
             }else{
                     map.removeChild(users[para.user_index],true);
+                    map.removeChild(userLabels[para.user_index],true);
             }
         });
 
