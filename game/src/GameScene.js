@@ -30,6 +30,7 @@ var userName;
 var scoreBox;
 var network = 1000;
 var networkLable;
+var latestTS = 0;
 
 var GameLayer = cc.Layer.extend({
 
@@ -302,6 +303,7 @@ var GameLayer = cc.Layer.extend({
 
         socket.on('user_index',function(newIndex){
             index = newIndex;
+            //userScore[newIndex] = INITIAL_SCORE;
         });
 
         //socket.on('update_direction', function(para){
@@ -330,15 +332,19 @@ var GameLayer = cc.Layer.extend({
         });
 
         socket.on('updateAllUserLocation', function(para){
-            HighLog("Update All Pos Received");
-            console.log(para.position);
-            for(var i=0; i<para.position.length; i+=2){
-                if(i/2!=index){
-                    users[i/2].x = para.position[i];
-                    users[i/2].y = para.position[i+1];
-                    HighLog("Update All Pos Proceed: "+i + " X: "+ users[i/2].x+  " Y: "+ users[i/2].y);
+            if(para.timestamp>latestTS){
+                latestTS = para.timestamp;
+                HighLog("Update All Pos Received");
+                console.log(para.position);
+                for(var i=0; i<para.position.length; i+=2){
+                    if(i/2!=index){
+                        users[i/2].x = para.position[i];
+                        users[i/2].y = para.position[i+1];
+                        HighLog("Update All Pos Proceed: "+i + " X: "+ users[i/2].x+  " Y: "+ users[i/2].y);
+                    }
                 }
             }
+
         });
 
         socket.on('user_leave', function(para){
@@ -600,7 +606,7 @@ function gameOver(score){
     box.setPosition(size.width/2, size.height/2);
     gameLayer.addChild(box, 0);
 
-    var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Arial");
+    var scoreLabel = new cc.LabelTTF("Score : " + userScore[this.index], "Arial");
     scoreLabel.setPosition(size.width/2, size.height/2);
     scoreLabel.setFontSize(36);
     scoreLabel.setColor(0,0,0);
