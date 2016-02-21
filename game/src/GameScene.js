@@ -299,11 +299,11 @@ var GameLayer = cc.Layer.extend({
             index = newIndex;
         });
 
-        socket.on('update_direction', function(para){
-            if (para.index!=index) {
-                angles[para.index] = para.newDirection;
-            }
-        });
+        //socket.on('update_direction', function(para){
+        //    if (para.index!=index) {
+        //        angles[para.index] = para.newDirection;
+        //    }
+        //});
 
         socket.on('update_speed', function(para){
             if (para.index!=index) {
