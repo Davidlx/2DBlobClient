@@ -102,13 +102,13 @@ var GameLayer = cc.Layer.extend({
                 map.addChild(userLabels[para.index], 0);
                 //new user movement
 
-                //window.setInterval(function () {
-                //    if(userStatus[para.index]=='running'){
-                //        lowLog("new user "+para.index+": "+ userStatus[para.index]);
-                //        otherUsersMove(users[para.index], angles[para.index], 3);
-                //        userLabels[para.index].setPosition(users[para.index].x, users[para.index].y);
-                //    }
-                //},REFRESH_TIME);
+                window.setInterval(function () {
+                    if(userStatus[para.index]=='running'){
+                        lowLog("new user "+para.index+": "+ userStatus[para.index]);
+                        otherUsersMove(users[para.index], angles[para.index], 3);
+                        userLabels[para.index].setPosition(users[para.index].x, users[para.index].y);
+                    }
+                },REFRESH_TIME);
 
             });
 
@@ -194,16 +194,16 @@ var GameLayer = cc.Layer.extend({
                 }
             }
             //old users movement
-            //window.setInterval(function () {
-            //    for(var i=0;i<index;i++) {
-            //        if (userStatus[i]=='running'){
-            //            //lowLog(i+": "+ userStatus[i]);
-            //            otherUsersMove(users[i], angles[i], 3);
-            //            userLabels[i].setPosition(users[i].x, users[i].y);
-            //        }
-            //
-            //    }
-            //},REFRESH_TIME);
+            window.setInterval(function () {
+                for(var i=0;i<index;i++) {
+                    if (userStatus[i]=='running'){
+                        //lowLog(i+": "+ userStatus[i]);
+                        otherUsersMove(users[i], angles[i], 3);
+                        userLabels[i].setPosition(users[i].x, users[i].y);
+                    }
+
+                }
+            },REFRESH_TIME);
 
             //update speed and angle
             window.setInterval(function () {
@@ -330,8 +330,6 @@ var GameLayer = cc.Layer.extend({
                 if(i/2!=index){
                     users[i/2].x = para.position[i];
                     users[i/2].y = para.position[i+1];
-                    userLabels[i/2].x = para.position[i];
-                    userLabels[i/2].y = para.position[i+1];
                     HighLog("Update All Pos Proceed: "+i + " X: "+ users[i/2].x+  " Y: "+ users[i/2].y);
                 }
             }
@@ -592,55 +590,60 @@ function gameOver(score){
 
     var fade_action = cc.fadeIn(2);
 
-    var box = new cc.Sprite(res.game_over_png);
-    //box.setScale(2);
+    var box = new cc.Sprite(res.gameoverBox_png);
     box.setPosition(size.width/2, size.height/2);
     gameLayer.addChild(box, 0);
     box.setOpacity(0);
     box.runAction(fade_action);
 
-    var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Verdana");
-    scoreLabel.setPosition(size.width/2 + 10, size.height/2 + 40);
+    var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Arial");
+    scoreLabel.setPosition(size.width/2 + 10, size.height/2 + 60);
     scoreLabel.setFontSize(36);
     scoreLabel.setColor(0,0,0);
     gameLayer.addChild(scoreLabel);
 
+    /*
+    var label1 = new cc.LabelTTF("Did you enjoy the game?", "Arial");
+    label1.setPosition(size.width/2 + 10, size.height/2 - 20);
+    label1.setFontSize(20);
+    label1.setColor(0,0,0);
+    gameLayer.addChild(label1);
+    */
+
+    var label2 = new cc.LabelTTF("Please fill in our questionnaire to help us make the game better!", "Arial");
+    label2.setPosition(size.width/2 + 10, size.height/2 - 20);
+    label2.setFontSize(18);
+    label2.setColor(0,0,0);
+    gameLayer.addChild(label2);
+
+    var url = new cc.LabelTTF("http://tp.sojump.cn/jq/7123174.aspx", "Arial");
+    url.setPosition(size.width/2 + 10, size.height/2 - 40);
+    url.setFontSize(16);
+    url.setColor(255,0,0);
+    gameLayer.addChild(url);
+
     var restartLabel = new cc.LabelTTF("Try again", "Verdana");
-    restartLabel.setPosition(size.width/2 - 40, size.height/2 + 40);
+    restartLabel.setPosition(size.width/2 - 110, size.height/2 - 110);
     restartLabel.setFontSize(18);
     restartLabel.setColor(0,0,0);
     gameLayer.addChild(restartLabel);
-
-    var exitLabel = new cc.LabelTTF("Exit", "Verdana");
-    exitLabel.setPosition(size.width/2 + 40, size.height/2 + 40);
-    exitLabel.setFontSize(18);
-    exitLabel.setColor(0,0,0);
-    gameLayer.addChild(exitLabel);
-
-
     /*
-     var continueMenuItem = new cc.MenuItemImage(
+     var restartLabel = new cc.MenuItemImage(
         "res/continue_up.png",
         "res/continue_down.png",
          function () {
-            cc.log("continueMenuItem is clicked!");
+            cc.log("restartLabel is clicked!");
             cc.director.pushScene(new cc.TransitionFade(1.2,new GameScene()));
          }, this);
-         continueMenuItem.x = size.width / 2;
-         continueMenuItem.y = size.height - 300;
+         restartLabel.x = size.width / 2;
+         restartLabel.y = size.height - 300;
      */
 
-    var label = new cc.LabelTTF("Please fill in our questionnaire to help us make the game better!", "Verdana");
-    label.setPosition(size.width/2 + 10, size.height/2 - 60);
-    label.setFontSize(18);
-    label.setColor(65,105,225);
-    gameLayer.addChild(label);
-
-    var url = new cc.LabelTTF("http://tp.sojump.cn/jq/7123174.aspx", "Arial");
-    url.setPosition(size.width/2 + 10, size.height/2 - 80);
-    url.setFontSize(16);
-    url.setColor(100,0,0);
-    gameLayer.addChild(url);
+    var exitLabel = new cc.LabelTTF("Exit", "Verdana");
+    exitLabel.setPosition(size.width/2 + 120, size.height/2 - 110);
+    exitLabel.setFontSize(18);
+    exitLabel.setColor(0,0,0);
+    gameLayer.addChild(exitLabel);
 
     cc.eventManager.removeAllListeners();
 }
