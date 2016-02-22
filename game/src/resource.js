@@ -19,10 +19,14 @@ var res = {
     home_down_png: "res/home_down.png",
     about_bg_png : "res/about_bg.png",
     title_png:"res/title.png",
+    title1_png:"res/title1.png",
     scoreBox_png:"res/scoreBox.png",
     blackBG_png:"res/blackBG.png",
     game_over_png:"res/game_over.png",
-    continue_png:"res/continue.png"
+    continue_png:"res/continue.png",
+    red_blob_png: "res/red_blob.png",
+    blue_blob_png: "res/blue_blob.png",
+    yellow_blob_png: "res/yellow_blob.png"
 };
 
 var g_resources = [];

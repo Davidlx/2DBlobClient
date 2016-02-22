@@ -17,10 +17,15 @@ var HelloWorldLayer = cc.Layer.extend({
         bg.y = size.height / 2;
         this.addChild(bg);
         
-        var title = new cc.Sprite(res.title_png);
+        var title = new cc.Sprite(res.title1_png);
         title.x = size.width / 2+20;
         title.y = size.height / 2+130;
         this.addChild(title);
+
+        title.setScale(20);
+        var scale = new cc.scaleTo(2,1);
+        var rotate = new cc.rotateTo(2,180);
+        title.runAction(cc.spawn(scale,rotate));
 
         //add start sprite
         var startMenuItem = new cc.MenuItemImage(
