@@ -82,7 +82,7 @@ var GameLayer = cc.Layer.extend({
                 users[para.index] = new cc.Sprite(res.ball_png);
                 users[para.index].setAnchorPoint(0.5, 0.5);
                 users[para.index].setScale(0.025);
-                users[para.index].setPosition(100,100);
+                users[para.index].setPosition(-1000,-1000);// make it outside the screen(there is a 1 second transiting animation)
                 userStatus[para.index]='running';
                 userNames[para.index]=para.name;
                 userSpeed[para.index]=0;
@@ -257,13 +257,13 @@ var GameLayer = cc.Layer.extend({
                     map.removeChild(userLabels[para.user_index],true);
                 }
 
-                users.splice(para.user_index,1);
-                userNames.splice(para.user_index,1);
+                //users.splice(para.user_index,1);
+                //userNames.splice(para.user_index,1);
                 //userScore.splice(index,1);
-                userSpeed.splice(para.user_index,1);
-                userStatus.splice(para.user_index,1);
-                userPos.splice(para.user_index*2,1);
-                userPos.splice(para.user_index*2+1,1);
+                //userSpeed.splice(para.user_index,1);
+                //userStatus.splice(para.user_index,1);
+                //userPos.splice(para.user_index*2,1);
+                //userPos.splice(para.user_index*2+1,1);
             });
 
             //regular updates
