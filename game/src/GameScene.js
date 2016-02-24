@@ -152,7 +152,7 @@ var GameLayer = cc.Layer.extend({
                     //change when have a new map
                     mousePos = event.getLocation();
                 }
-            }, ball);
+            },ball);
 
 
 
@@ -557,7 +557,6 @@ function gameOver(){
     url.setPosition(size.width/2 + 10, size.height/2 - 40);
     url.setFontSize(16);
     url.setColor(255,0,0);
-    url.getParent().onclick = window.location.href = "http://tp.sojump.cn/jq/7123174.aspx";
     gameLayer.addChild(url);
 
     var restartLabel = new cc.LabelTTF("Try again", "Verdana");
@@ -582,9 +581,27 @@ function gameOver(){
     exitLabel.setFontSize(18);
     exitLabel.setColor(0,0,0);
     gameLayer.addChild(exitLabel);
+    cc.eventManager.addListener({
+        event: cc.EventListener.MOUSE,
+        onMouseUp: function(event){
+            var pos = event.getLocation();
+            if(cc.rectContainsPoint(url.getBoundingBox(), pos)){
+                window.location.href = "http://tp.sojump.cn/jq/7123174.aspx";
+            }
 
+        },
+        onMouseMove: function(event){
+            var pos = event.getLocation();
+            if(cc.rectContainsPoint(url.getBoundingBox(), pos)){
+                cc._canvas.style.cursor = 'pointer';
+            }
+            else{
+                cc._canvas.style.cursor = 'default';
+            }
 
-    cc.eventManager.removeAllListeners();
+        }
+    },url);
+
 }
 
 
@@ -593,5 +610,5 @@ function lowLog(msg){
 }
 
 function HighLog(msg){
-    console.log("High Log: "+ msg);
+    //console.log("High Log: "+ msg);
 }
