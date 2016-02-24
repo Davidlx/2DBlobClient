@@ -557,6 +557,7 @@ function gameOver(){
     url.setPosition(size.width/2 + 10, size.height/2 - 40);
     url.setFontSize(16);
     url.setColor(255,0,0);
+    url.getParent().onclick = window.location.href = "http://tp.sojump.cn/jq/7123174.aspx";
     gameLayer.addChild(url);
 
     var restartLabel = new cc.LabelTTF("Try again", "Verdana");
