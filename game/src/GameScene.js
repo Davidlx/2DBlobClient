@@ -3,19 +3,19 @@ console.log(url);
 var socket = io(url);
 var REFRESH_TIME = 15;
 var INITIAL_SCORE = 5;
-var gameLayer
+var REGULAR_UPDATES_RATE = 15;
+var gameLayer;
 var index = 0;
 var size;
 var map;
 var ballSize;
-var score;
 var food = [];
 var mousePos;
 var map_userSpawnPosX=0;
 var map_userSpawnPosY=0;
 var stop = false;
 
-var users = new Array();
+var users = [];
 var userNames = [];
 var userLabels = [];
 var userSpeed = [];
@@ -26,7 +26,6 @@ var angles = [];
 var food_posi = [];
 var food_type = [];
 
-var userName;
 var scoreBox;
 var network = 1000;
 var networkLable;
@@ -39,13 +38,9 @@ var GameLayer = cc.Layer.extend({
 
         socket.emit('user_name','test');
         gameLayer=this;
-        //cc.log("Game init");
          map = new cc.TMXTiledMap(res.map_tmx);
 
         socket.on('game_init_info',function(para){
-            for(var i=0;i<para.direction.length;i++){
-                angles[i] = para.direction[i];
-            }
             for(var i=0;i<para.name.length;i++){
                 userNames[i] = para.name[i];
             }
@@ -101,15 +96,6 @@ var GameLayer = cc.Layer.extend({
                 userLabels[para.index].setPosition(users[para.index].x, users[para.index].y);
                 userLabels[para.index].setColor(cc.color(0, 0, 0));
                 map.addChild(userLabels[para.index], 0);
-                //new user movement
-
-                //window.setInterval(function () {
-                //    if(userStatus[para.index]=='running'){
-                //        lowLog("new user "+para.index+": "+ userStatus[para.index]);
-                //        otherUsersMove(users[para.index], angles[para.index], 3);
-                //        userLabels[para.index].setPosition(users[para.index].x, users[para.index].y);
-                //    }
-                //},REFRESH_TIME);
 
             });
 
@@ -149,12 +135,10 @@ var GameLayer = cc.Layer.extend({
             scoreBox.setPosition(size.width - 180, 70);
             gameLayer.addChild(scoreBox);
 
-            var REGULAR_UPDATES_RATE = 15;
             var speed = 0;
             var angle = 0;
-            score = 5;
 
-            var scoreLabel = new cc.LabelTTF("Score : " + score, "Arial");
+            var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Arial");
             scoreLabel.setPosition(size.width - 180, 70);
             gameLayer.addChild(scoreLabel);
 
@@ -199,17 +183,6 @@ var GameLayer = cc.Layer.extend({
 
                 }
             }
-            //old users movement
-            //window.setInterval(function () {
-            //    for(var i=0;i<index;i++) {
-            //        if (userStatus[i]=='running'){
-            //            //lowLog(i+": "+ userStatus[i]);
-            //            otherUsersMove(users[i], angles[i], 3);
-            //            userLabels[i].setPosition(users[i].x, users[i].y);
-            //        }
-            //
-            //    }
-            //},REFRESH_TIME);
 
             //update speed and angle
             window.setInterval(function () {
@@ -278,16 +251,15 @@ var GameLayer = cc.Layer.extend({
                     userLabels[para.index].setFontSize((ballSize / 2) * calculatePlayerScale(userScore[para.index]));
                 }
                 if(para.user_index==index){
-                    gameOver(para.score);
+                    gameOver();
                 }else{
                     map.removeChild(users[para.user_index],true);
                     map.removeChild(userLabels[para.user_index],true);
                 }
 
                 users.splice(para.user_index,1);
-                angles.splice(para.user_index,1);
-                userScore.splice(para.user_index,1);
                 userNames.splice(para.user_index,1);
+                //userScore.splice(index,1);
                 userSpeed.splice(para.user_index,1);
                 userStatus.splice(para.user_index,1);
                 userPos.splice(para.user_index*2,1);
@@ -303,25 +275,14 @@ var GameLayer = cc.Layer.extend({
 
         socket.on('user_index',function(newIndex){
             index = newIndex;
-            //userScore[newIndex] = INITIAL_SCORE;
+            userScore[newIndex] = INITIAL_SCORE;
         });
-
-        //socket.on('update_direction', function(para){
-        //    if (para.index!=index) {
-        //        angles[para.index] = para.newDirection;
-        //    }
-        //});
 
         socket.on('update_speed', function(para){
             if (para.index!=index) {
                 users[para.index].speed = para.speed;
             }
         });
-
-        //socket.on('update_position', function(para){
-        //    users[para.index].setPositionX(para.posi_x);
-        //    users[para.index].setPositionY(para.posi_y);
-        //});
 
         socket.on('status_update', function(para){
             userStatus[para.index] = para.status;
@@ -380,17 +341,6 @@ var GameLayer = cc.Layer.extend({
         });
 
         }
-
-
-    /*
-    deleteFood: function(sprite){
-        var i = this.food.indexOf(sprite);
-        if(i > -1) {
-            this.food.splice(i,1);
-        }
-        this.food[i].getParent().removeChildByTag(food[i].getTag(), true);
-    }
-    */
 
 });
 
@@ -570,35 +520,7 @@ function getUNIXTimestamp(){
     return Math.floor(Date.now());//change the server accordingly.
 }
 
-function lowLog(msg){
-    //console.log("Low Log: "+ msg);
-}
-
-function HighLog(msg){
-    console.log("High Log: "+ msg);
-}
-
-/*function gameOver(){
-    //TODO: GAME OVER PAGE
-    lowLog("gg");
-    size = cc.director.getWinSize();
-    var info1 = new cc.LabelTTF("GAME OVER", "Arial");
-    info1.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-    info1.setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-    info1.setFontSize(100);
-    info1.setPosition(size.width/2,size.height/2-100);
-    info1.setColor(cc.color(0, 0, 100));
-    gameLayer.addChild(info1, 0);
-    var info2 = new cc.LabelTTF("We are sorry but the game over page is still under construction \n Please refresh the website to reconnect.", "Arial");
-    info2.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-    info2.setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-    info2.setFontSize(30);
-    info2.setPosition(size.width/2,size.height/2+100);
-    info2.setColor(cc.color(0, 0, 100));
-    gameLayer.addChild(info2, 0);
-}*/
-
-function gameOver(score){
+function gameOver(){
     var bg = new cc.Sprite(res.blackBG_png);
 
     bg.setPosition(size.width / 2, size.height / 2);
@@ -608,11 +530,19 @@ function gameOver(score){
     box.setPosition(size.width/2, size.height/2);
     gameLayer.addChild(box, 0);
 
-    var scoreLabel = new cc.LabelTTF("Score : " + userScore[this.index], "Arial");
+    var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Arial");
     scoreLabel.setPosition(size.width/2, size.height/2);
     scoreLabel.setFontSize(36);
     scoreLabel.setColor(0,0,0);
     gameLayer.addChild(scoreLabel);
-
     cc.eventManager.removeAllListeners();
+}
+
+
+function lowLog(msg){
+    //console.log("Low Log: "+ msg);
+}
+
+function HighLog(msg){
+    console.log("High Log: "+ msg);
 }
