@@ -2,7 +2,7 @@ var url = window.location.href;
 console.log(url);
 var socket = io(url);
 var REFRESH_TIME = 15;
-var INITIAL_SCORE = 5;
+var INITIAL_SCORE = 10;
 var REGULAR_UPDATES_RATE = 15;
 var gameLayer;
 var index = 0;
@@ -36,7 +36,7 @@ var GameLayer = cc.Layer.extend({
         ctor: function(){
         this._super();
 
-        socket.emit('user_name','test');
+        //socket.emit('user_name','test');
         gameLayer=this;
          map = new cc.TMXTiledMap(res.map_tmx);
 
@@ -81,7 +81,7 @@ var GameLayer = cc.Layer.extend({
                 lowLog("NEW USER ADD: "+para.index);
                 users[para.index] = new cc.Sprite(res.ball_png);
                 users[para.index].setAnchorPoint(0.5, 0.5);
-                users[para.index].setScale(0.025);
+                users[para.index].setScale(calculatePlayerScale(INITIAL_SCORE));
                 users[para.index].setPosition(-1000,-1000);// make it outside the screen(there is a 1 second transiting animation)
                 userStatus[para.index]='running';
                 userNames[para.index]=para.name;
@@ -89,7 +89,7 @@ var GameLayer = cc.Layer.extend({
                 angles[para.index]=0;
                 map.addChild(users[para.index],0);
 
-                userLabels[para.index] = new cc.LabelTTF("PH", "Arial");
+                userLabels[para.index] = new cc.LabelTTF(para.name, "Arial");
                 userLabels[para.index].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
                 userLabels[para.index].setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
                 userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(INITIAL_SCORE));
@@ -120,10 +120,10 @@ var GameLayer = cc.Layer.extend({
             ball.setPosition(size.width / 2, size.height / 2);
             map.setPosition(scr_userSpawnPosX, scr_userSpawnPosY);
             ballSize = ball.getContentSize().width;
-            ball.setScale(0.025);
+            ball.setScale(calculatePlayerScale(INITIAL_SCORE));
             gameLayer.addChild(ball, 0);
 
-            userLabels[index] = new cc.LabelTTF("You", "Arial");
+            userLabels[index] = new cc.LabelTTF(userNames[index], "Arial");
             userLabels[index].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             userLabels[index].setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             userLabels[index].setFontSize(ballSize / 2 * ball.getScale());
@@ -170,7 +170,7 @@ var GameLayer = cc.Layer.extend({
             //old users label
             for(var i=0; i<userNames.length; i++){
                 if(i!=index){
-                    userLabels[i] = new cc.LabelTTF("PH", "Arial");
+                    userLabels[i] = new cc.LabelTTF(userNames[i], "Arial");
                     userLabels[i].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
                     userLabels[i].setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
                     userLabels[i].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[i]));
@@ -182,7 +182,6 @@ var GameLayer = cc.Layer.extend({
 
                 }
             }
-
             //update speed and angle
             window.setInterval(function () {
                 if(stop){move(ball,0,0);}
@@ -344,7 +343,7 @@ var GameLayer = cc.Layer.extend({
 var GameScene = cc.Scene.extend({
     onEnter:function(){
         this._super();
-        var layer = new GameLayer;
+        var layer = new GameLayer();
         this.addChild(layer);
         layer.init();
     }
@@ -489,8 +488,11 @@ function calculatePlayerScale(score){
     if(score<100){
         scale = score*0.005;
     }
-    else{
+    else if(score<400){
         scale = 100*0.005 + (score-100)*0.0005;
+    }
+    else{
+        scale = 100*0.005 + 300*0.0005;
     }
     return scale;
 }
@@ -525,55 +527,60 @@ function gameOver(){
 
     var fade_action = cc.fadeIn(2);
 
-    var box = new cc.Sprite(res.game_over_png);
-    //box.setScale(2);
+    var box = new cc.Sprite(res.gameoverBox_png);
     box.setPosition(size.width/2, size.height/2);
     gameLayer.addChild(box, 0);
     box.setOpacity(0);
     box.runAction(fade_action);
 
-    var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Verdana");
-    scoreLabel.setPosition(size.width/2 + 10, size.height/2 + 40);
+    var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Arial");
+    scoreLabel.setPosition(size.width/2 + 10, size.height/2 + 60);
     scoreLabel.setFontSize(36);
     scoreLabel.setColor(0,0,0);
     gameLayer.addChild(scoreLabel);
 
+    /*
+    var label1 = new cc.LabelTTF("Did you enjoy the game?", "Arial");
+    label1.setPosition(size.width/2 + 10, size.height/2 - 20);
+    label1.setFontSize(20);
+    label1.setColor(0,0,0);
+    gameLayer.addChild(label1);
+    */
+
+    var label2 = new cc.LabelTTF("Please fill in our questionnaire to help us make the game better!", "Arial");
+    label2.setPosition(size.width/2 + 10, size.height/2 - 20);
+    label2.setFontSize(18);
+    label2.setColor(0,0,0);
+    gameLayer.addChild(label2);
+
+    var url = new cc.LabelTTF("http://tp.sojump.cn/jq/7123174.aspx", "Arial");
+    url.setPosition(size.width/2 + 10, size.height/2 - 40);
+    url.setFontSize(16);
+    url.setColor(255,0,0);
+    gameLayer.addChild(url);
+
     var restartLabel = new cc.LabelTTF("Try again", "Verdana");
-    restartLabel.setPosition(size.width/2 - 40, size.height/2 + 40);
+    restartLabel.setPosition(size.width/2 - 110, size.height/2 - 110);
     restartLabel.setFontSize(18);
     restartLabel.setColor(0,0,0);
     gameLayer.addChild(restartLabel);
-
-    var exitLabel = new cc.LabelTTF("Exit", "Verdana");
-    exitLabel.setPosition(size.width/2 + 40, size.height/2 + 40);
-    exitLabel.setFontSize(18);
-    exitLabel.setColor(0,0,0);
-    gameLayer.addChild(exitLabel);
-
-
     /*
-     var continueMenuItem = new cc.MenuItemImage(
+     var restartLabel = new cc.MenuItemImage(
         "res/continue_up.png",
         "res/continue_down.png",
          function () {
-            cc.log("continueMenuItem is clicked!");
+            cc.log("restartLabel is clicked!");
             cc.director.pushScene(new cc.TransitionFade(1.2,new GameScene()));
          }, this);
-         continueMenuItem.x = size.width / 2;
-         continueMenuItem.y = size.height - 300;
+         restartLabel.x = size.width / 2;
+         restartLabel.y = size.height - 300;
      */
 
-    var label = new cc.LabelTTF("Please fill in our questionnaire to help us make the game better!", "Verdana");
-    label.setPosition(size.width/2 + 10, size.height/2 - 60);
-    label.setFontSize(18);
-    label.setColor(65,105,225);
-    gameLayer.addChild(label);
-
-    var url = new cc.LabelTTF("http://tp.sojump.cn/jq/7123174.aspx", "Arial");
-    url.setPosition(size.width/2 + 10, size.height/2 - 80);
-    url.setFontSize(16);
-    url.setColor(100,0,0);
-    gameLayer.addChild(url);
+    var exitLabel = new cc.LabelTTF("Exit", "Verdana");
+    exitLabel.setPosition(size.width/2 + 120, size.height/2 - 110);
+    exitLabel.setFontSize(18);
+    exitLabel.setColor(0,0,0);
+    gameLayer.addChild(exitLabel);
 
 
     cc.eventManager.removeAllListeners();
