@@ -126,7 +126,12 @@ var GameLayer = cc.Layer.extend({
             userLabels[index] = new cc.LabelTTF(userNames[index], "Arial");
             userLabels[index].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             userLabels[index].setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-            userLabels[index].setFontSize(ballSize / 2 * calculatePlayerScale(INITIAL_SCORE)*(4/userNames[index].length));
+            if(userNames[index].length>3){
+                userLabels[index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[index])*(4/userNames[index].length));
+            }
+            else{
+                userLabels[index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[index]));
+            }
             userLabels[index].setPosition(cc.p(ball.getPositionX(), ball.getPositionY()));
             userLabels[index].setColor(cc.color(0, 0, 0));
             gameLayer.addChild(userLabels[index], 0);
@@ -173,7 +178,12 @@ var GameLayer = cc.Layer.extend({
                     userLabels[i] = new cc.LabelTTF(userNames[i], "Arial");
                     userLabels[i].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
                     userLabels[i].setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-                    userLabels[i].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[i])*(4/userNames[i].length));
+                    if(userNames[i].length>3){
+                        userLabels[i].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[i])*(4/userNames[i].length));
+                    }
+                    else{
+                        userLabels[i].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[i]));
+                    }
                     userLabels[i].setPosition(users[i].x, users[i].y);
                     userLabels[i].setColor(cc.color(0, 0, 0));
                     if(userStatus[i]=='running'){
@@ -224,12 +234,22 @@ var GameLayer = cc.Layer.extend({
                 userScore[para.index] = para.score;
                 if(para.index == index){
                     ball.setScale(calculatePlayerScale(userScore[index]));
-                    userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
+                    if(userNames[para.index].length>3){
+                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
+                    }
+                    else{
+                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
+                    }
                     scoreLabel.setString("Score: " + para.score);
                 }
                 else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
-                    userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
+                    if(userNames[para.index].length>3){
+                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
+                    }
+                    else{
+                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
+                    }
                 }
             });
 
@@ -242,11 +262,21 @@ var GameLayer = cc.Layer.extend({
                 userScore[para.index] = para.score;
                 if(para.index == index){
                     ball.setScale(calculatePlayerScale(userScore[para.index]));
-                    userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
+                    if(userNames[para.index].length>3){
+                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
+                    }
+                    else{
+                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
+                    }
                     lowLog("YOU HAVE EATEN A USER!");
                 }else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
-                    userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
+                    if(userNames[para.index].length>3){
+                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
+                    }
+                    else{
+                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
+                    }
                 }
                 if(para.user_index==index){
                     gameOver();
