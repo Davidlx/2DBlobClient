@@ -3,7 +3,9 @@ console.log(url);
 var socket = io(url);
 var REFRESH_TIME = 15;
 var INITIAL_SCORE = 10;
+var INITIAL_SPEED = 3;
 var REGULAR_UPDATES_RATE = 15;
+
 var gameLayer;
 var index = 0;
 var size;
@@ -18,7 +20,8 @@ var stop = false;
 var users = [];
 var userNames = [];
 var userLabels = [];
-var userSpeed = [];
+var angle = 0;
+var speed = INITIAL_SPEED;
 var userScore = [];
 var userStatus = [];
 var userPos = [];
@@ -43,9 +46,6 @@ var GameLayer = cc.Layer.extend({
         socket.on('game_init_info',function(para){
             for(var i=0;i<para.name.length;i++){
                 userNames[i] = para.name[i];
-            }
-            for(var i=0;i<para.speed.length;i++){
-                userSpeed[i] = para.speed[i];
             }
             for(var i=0;i<para.score.length;i++){
                 userScore[i] = para.score[i];
@@ -85,7 +85,6 @@ var GameLayer = cc.Layer.extend({
                 users[para.index].setPosition(-1000,-1000);// make it outside the screen(there is a 1 second transiting animation)
                 userStatus[para.index]='running';
                 userNames[para.index]=para.name;
-                userSpeed[para.index]=0;
                 angles[para.index]=0;
                 map.addChild(users[para.index],0);
 
@@ -140,8 +139,6 @@ var GameLayer = cc.Layer.extend({
             scoreBox.setPosition(size.width - 180, 70);
             gameLayer.addChild(scoreBox);
 
-            var speed = 0;
-            var angle = 0;
 
             var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Arial");
             scoreLabel.setPosition(size.width - 180, 70);
@@ -197,9 +194,10 @@ var GameLayer = cc.Layer.extend({
                 if(stop){move(ball,0,0);}
                 else {
                     ball.angle = calculateAngle(mousePos, ball, angle);
-                    ball.speed = calculateSpeed(mousePos, ball, ball.speed, size);
+                    ball.speed = speed;
                     move(ball, ball.angle, ball.speed);
                 }
+                console.log("speed: "+speed);
             }, REFRESH_TIME);
 
             //collision detection
@@ -234,6 +232,7 @@ var GameLayer = cc.Layer.extend({
                 userScore[para.index] = para.score;
                 if(para.index == index){
                     ball.setScale(calculatePlayerScale(userScore[index]));
+                    speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
                     if(userNames[para.index].length>3){
                         userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
                     }
@@ -262,6 +261,7 @@ var GameLayer = cc.Layer.extend({
                 userScore[para.index] = para.score;
                 if(para.index == index){
                     ball.setScale(calculatePlayerScale(userScore[para.index]));
+                    speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
                     if(userNames[para.index].length>3){
                         userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
                     }
@@ -304,12 +304,6 @@ var GameLayer = cc.Layer.extend({
         socket.on('user_index',function(newIndex){
             index = newIndex;
             userScore[newIndex] = INITIAL_SCORE;
-        });
-
-        socket.on('update_speed', function(para){
-            if (para.index!=index) {
-                users[para.index].speed = para.speed;
-            }
         });
 
         socket.on('status_update', function(para){
@@ -413,39 +407,6 @@ function move(ball, angle, speed){
     }
 }
 
-function otherUsersMove(ball, angle, speed){
-    var isLeft = true;
-    var isRight = true;
-    var isUp = true;
-    var isDown = true;
-    var sin = Math.sin(angle);
-    var cos = Math.cos(angle);
-    if(ball.x<10) isLeft = false;
-    else isLeft = true;
-    if(ball.x>map.width-10) isRight = false;
-    else isRight = true;
-    if(ball.y<10) isDown = false;
-    else isDown = true;
-    if(ball.y>map.height-10) isUp = false;
-    else isUp = true;
-
-    if(cos<0){
-        if(isRight) ball.x-= speed * cos;
-        if(sin<0){
-            if(isUp) ball.y-= speed * sin;
-        }else{
-            if(isDown) ball.y -= speed * sin;
-        }
-    }else {
-        if(isLeft) ball.x -= speed * cos;
-        if(sin<0){
-            if(isUp) ball.y -= speed * sin;
-        }else{
-            if(isDown) ball.y -= speed * sin;
-        }
-    }
-}
-
 //add on the map via client
 function addFood(food_index){
     var food_pos_x = Math.round(Math.random()*map.width);
@@ -484,7 +445,6 @@ function collisionDetection(player, sprite2) {
         return false;
 }
 
-
 function calculateAngle(sourcePoint,targetPoint,angle){//ball - source, mouse - targetpoint
     var tempAngle = (Math.atan2(targetPoint.y-sourcePoint.y,targetPoint.x-sourcePoint.x));
     // if (tempAngle != angle) {
@@ -495,39 +455,31 @@ function calculateAngle(sourcePoint,targetPoint,angle){//ball - source, mouse - 
     return tempAngle;
 }
 
-function calculateSpeed(sourcePoint,targetPoint,speed,size){//ball - source, mouse - targetpoint
-    var tempSpeed = calculateSpeedAlgorithm(sourcePoint,targetPoint,size);
-    // if (tempSpeed != speed) {
-    //     speed = tempSpeed;
-    //     socket.emit('update_user_speed',index,getUserPosition()[0],getUserPosition()[1],tempSpeed,getUNIXTimestamp());
-    // }
-    return tempSpeed;
+function calculateSpeedAlgorithm(scale){
+    var speed;
+    if(scale ==0.002*INITIAL_SCORE){
+        speed = INITIAL_SPEED;
+        return speed;
+    }
+    var radius = (scale*500)/2;
+    speed = INITIAL_SPEED *(1-radius*0.025);
+    return speed;
 }
-
-function calculateSpeedAlgorithm(soucePoint,targetPoint,size){
-    var x = (targetPoint.x-soucePoint.x)*(targetPoint.x-soucePoint.x);
-    var y = (targetPoint.y-soucePoint.y)*(targetPoint.y-soucePoint.y);
-
-    var distance = Math.sqrt(x+y);
-    return 3;
-}
-
 
 function calculatePlayerScale(score){
     var scale;
     if(score<100){
-        scale = score*0.005;
+        scale = score*0.002;
     }
     else if(score<400){
-        scale = 100*0.005 + (score-100)*0.0005;
+        scale = 100*0.002 + (score-100)*0.0002;
     }
     else{
-        scale = 100*0.005 + 300*0.0005;
+        scale = 100*0.002 + 300*0.0002;
     }
     return scale;
 }
 
-function updateClientStatus(ball,mousePos,speed,angle){}
 
 function map2screen(mapX, mapY){
     var x = mapX + map.getPositionX();
