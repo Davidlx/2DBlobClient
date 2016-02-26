@@ -462,20 +462,20 @@ function calculateSpeedAlgorithm(scale){
         return speed;
     }
     var radius = (scale*500)/2;
-    speed = INITIAL_SPEED *(1-radius*0.025);
+    speed = INITIAL_SPEED *(1-radius*0.0018);
     return speed;
 }
 
 function calculatePlayerScale(score){
     var scale;
     if(score<100){
-        scale = score*0.002;
+        scale = score*0.003;
     }
-    else if(score<400){
-        scale = 100*0.002 + (score-100)*0.0002;
+    else if(score<500){
+        scale = 100*0.003 + (score-100)*0.0006;
     }
     else{
-        scale = 100*0.002 + 300*0.0002;
+        scale = 100*0.003 + 500*0.0006;
     }
     return scale;
 }
