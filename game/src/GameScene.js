@@ -317,17 +317,16 @@ var GameLayer = cc.Layer.extend({
         socket.on('updateAllUserLocation', function(para){
             if(para.timestamp>latestTS){
                 latestTS = para.timestamp;
-                for(var i=0; i<para.position.length; i+=2){
-                    if(i/2!=index){
-                        users[i/2].x = para.position[i];
-                        users[i/2].y = para.position[i+1];
-                        userLabels[i/2].x = para.position[i];
-                        userLabels[i/2].y = para.position[i+1];
-                        HighLog("Update All Pos Proceed: "+i + " X: "+ users[i/2].x+  " Y: "+ users[i/2].y);
+                for(var i=0; i<para.uid.length; i++){
+                    if(para.uid[i]!=index){
+                        users[para.uid[i]].x = para.position[para.uid[i]*2];
+                        users[para.uid[i]].y = para.position[para.uid[i]*2+1];
+                        userLabels[para.uid[i]].x = para.position[para.uid[i]*2];
+                        userLabels[para.uid[i]].y = para.position[para.uid[i]*2+1];
+                        HighLog("Update All Pos Proceed: "+para.uid[i] + " X: "+ users[para.uid[i]/2].x+  " Y: "+ users[para.uid[i]/2].y);
                     }
                 }
             }
-
         });
 
         socket.on('user_leave', function(para){
