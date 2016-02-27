@@ -11,16 +11,27 @@ var HelloWorldLayer = cc.Layer.extend({
         //    you may modify it.
         // ask the window size
         var size = cc.winSize;
-
+        this._box1 = cc.EditBox(cc.size(170, 50),new cc.Scale9Sprite("res/input_box.png"));
+        this._box1.setPosition(cc.p(size.width/2,size.height/2));
+        this._box1.setFont("American Typewriter", 26);
+        this._box1.setFontColor(cc.color(5,4,10));
+        this._box1.setPlaceHolder("Enter your nickname");
+        this._box1.setPlaceholderFontColor(cc.color(117, 76, 36));
+        this._box1.setMaxLength(20);
+        this._box1.setReturnType(cc.EditBox.KEYBOARD_RETURNTYPE_DONE);
+        this._box1.setDelegate(this);
+        this.addChild(this._box1,8);
         var bg = new cc.Sprite(res.first_bg_png);
         bg.x = size.width / 2;
         bg.y = size.height / 2;
         this.addChild(bg);
-        
+
         var title = new cc.Sprite(res.title_png);
         title.x = size.width / 2+20;
         title.y = size.height / 2+130;
         this.addChild(title);
+
+
 
         //add start sprite
         var startMenuItem = new cc.MenuItemImage(
