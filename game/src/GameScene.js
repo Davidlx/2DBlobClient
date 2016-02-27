@@ -319,10 +319,10 @@ var GameLayer = cc.Layer.extend({
                 latestTS = para.timestamp;
                 for(var i=0; i<para.uid.length; i++){
                     if(para.uid[i]!=index){
-                        users[para.uid[i]].x = para.position[para.uid[i]*2];
-                        users[para.uid[i]].y = para.position[para.uid[i]*2+1];
-                        userLabels[para.uid[i]].x = para.position[para.uid[i]*2];
-                        userLabels[para.uid[i]].y = para.position[para.uid[i]*2+1];
+                        users[para.uid[i]].x = para.position[i*2];
+                        users[para.uid[i]].y = para.position[i*2+1];
+                        userLabels[para.uid[i]].x = para.position[i*2];
+                        userLabels[para.uid[i]].y = para.position[i*2+1];
                         HighLog("Update All Pos Proceed: "+para.uid[i] + " X: "+ users[para.uid[i]].x+  " Y: "+ users[para.uid[i]].y);
                     }
                 }
