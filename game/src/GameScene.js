@@ -197,7 +197,7 @@ var GameLayer = cc.Layer.extend({
                     ball.speed = speed;
                     move(ball, ball.angle, ball.speed);
                 }
-                console.log("speed: "+speed);
+                //console.log("speed: "+speed);
             }, REFRESH_TIME);
 
             //collision detection
@@ -323,7 +323,7 @@ var GameLayer = cc.Layer.extend({
                         users[para.uid[i]].y = para.position[para.uid[i]*2+1];
                         userLabels[para.uid[i]].x = para.position[para.uid[i]*2];
                         userLabels[para.uid[i]].y = para.position[para.uid[i]*2+1];
-                        HighLog("Update All Pos Proceed: "+para.uid[i] + " X: "+ users[para.uid[i]/2].x+  " Y: "+ users[para.uid[i]/2].y);
+                        HighLog("Update All Pos Proceed: "+para.uid[i] + " X: "+ users[para.uid[i]].x+  " Y: "+ users[para.uid[i]].y);
                     }
                 }
             }
