@@ -5,6 +5,7 @@ var REFRESH_TIME = 15;
 var INITIAL_SCORE = 10;
 var INITIAL_SPEED = 3;
 var REGULAR_UPDATES_RATE = 15;
+var POWER_UP_TIME = 10000;
 
 var gameLayer;
 var index = 0;
@@ -22,6 +23,7 @@ var userNames = [];
 var userLabels = [];
 var angle = 0;
 var speed = INITIAL_SPEED;
+var isSpeedUp = false;
 var userScore = [];
 var userStatus = [];
 var userPos = [];
@@ -238,14 +240,15 @@ var GameLayer = cc.Layer.extend({
                         userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
                     }
                     scoreLabel.setString("Score: " + para.score);
-                    
+
                     if(para.food_type == 1)
                     {
-                        socket.on('speed_up_succ', function(para){
-                            HighLog("Speed Up Received");
-                            var baseSpeed = para.speed;
-                            INITIAL_SPEED = baseSpeed*5;
-                        });
+                        isSpeedUp = true;
+                        speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
+                        window.setTimeout(function(){
+                            isSpeedUp = false;
+                            speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
+                        },POWER_UP_TIME);
                     }
                 }
                 else{
@@ -472,13 +475,18 @@ function calculateAngle(sourcePoint,targetPoint,angle){//ball - source, mouse - 
 
 function calculateSpeedAlgorithm(scale){
     var speed;
-    if(scale ==0.002*INITIAL_SCORE){
-        speed = INITIAL_SPEED;
+    if(isSpeedUp == true){
+        return INITIAL_SPEED * 2;
+    }
+    else{
+        if(scale ==0.002*INITIAL_SCORE){
+            speed = INITIAL_SPEED;
+            return speed;
+        }
+        var radius = (scale*500)/2;
+        speed = INITIAL_SPEED *(1-radius*0.0018);
         return speed;
     }
-    var radius = (scale*500)/2;
-    speed = INITIAL_SPEED *(1-radius*0.0018);
-    return speed;
 }
 
 function calculatePlayerScale(score){
