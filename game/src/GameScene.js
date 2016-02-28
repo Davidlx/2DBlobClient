@@ -238,6 +238,15 @@ var GameLayer = cc.Layer.extend({
                         userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
                     }
                     scoreLabel.setString("Score: " + para.score);
+                    
+                    if(para.food_type == 1)
+                    {
+                        socket.on('speed_up_succ', function(para){
+                            HighLog("Speed Up Received");
+                            var baseSpeed = para.speed;
+                            INITIAL_SPEED = baseSpeed*5;
+                        });
+                    }
                 }
                 else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
@@ -249,6 +258,7 @@ var GameLayer = cc.Layer.extend({
                     }
                 }
             });
+
 
             socket.on('user_eat_succ', function(para){
                 //any user who have eat a food will cause this.
