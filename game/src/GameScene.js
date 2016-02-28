@@ -57,13 +57,14 @@ var GameLayer = cc.Layer.extend({
                 userPos[i] = para.position[i];
                 userPos[i+1] = para.position[i+1];
             }
+            /*for(var i=0;i<para.food_type.length;i++){
+                food_type[i] = para.food_type[i];
+            }*/
             for(var i=0;i<para.food.length;i+=2){
                 food_posi[i] = para.food[i];
                 food_posi[i+1] = para.food[i+1];
-                addFoodOnMap(i/2,para.food[i],para.food[i+1]);
-            }
-            for(var i=0;i<para.food_type.length;i++){
                 food_type[i] = para.food_type[i];
+                addFoodOnMap(i/2,para.food_type[i/2],para.food[i],para.food[i+1]);
             }
         });
 
@@ -99,14 +100,11 @@ var GameLayer = cc.Layer.extend({
             });
 
             socket.on('food_add', function(para){
-                if(para.type == 0){
-                    food_posi[para.food_index*2] = para.posi_x;
-                    food_posi[para.food_index*2+2] = para.posi_y;
-                    food_type[para.food_index] = 0;
-                    addFoodOnMap(para.food_index,para.posi_x,para.posi_y);
-                }
+                food_posi[para.food_index*2] = para.posi_x;
+                food_posi[para.food_index*2+2] = para.posi_y;
+                food_type[para.food_index] = para.food_type;
+                addFoodOnMap(para.food_index,para.food_type[para.food_index], para.posi_x,para.posi_y);
             });
-
 
 
             var ball = new cc.Sprite(res.ball_png);
@@ -407,19 +405,27 @@ function move(ball, angle, speed){
 }
 
 //add on the map via client
-function addFood(food_index){
+function addFood(food_index, food_type){
     var food_pos_x = Math.round(Math.random()*map.width);
     var food_pos_y = Math.round(Math.random()*map.height);
-    addFoodOnMap(food_index,food_pos_x,food_pos_y)
+    addFoodOnMap(food_index, food_type, food_pos_x,food_pos_y)
 }
 
 //add food based on server response
-function addFoodOnMap(food_index,food_pos_x,food_pos_y){
-    var random_num = Math.round(Math.random()*3);
-    if(random_num == 0) food[food_index] = new cc.Sprite(res.food_red_png);
-    if(random_num == 1) food[food_index] = new cc.Sprite(res.food_blue_png);
-    if(random_num == 2) food[food_index] = new cc.Sprite(res.food_green_png);
-    if(random_num == 3) food[food_index] = new cc.Sprite(res.food_purple_png);
+function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y){
+    if(food_type == 0)
+    {
+        var random_num = Math.round(Math.random()*3);
+        if(random_num == 0) food[food_index] = new cc.Sprite(res.food_red_png);
+        if(random_num == 1) food[food_index] = new cc.Sprite(res.food_blue_png);
+        if(random_num == 2) food[food_index] = new cc.Sprite(res.food_green_png);
+        if(random_num == 3) food[food_index] = new cc.Sprite(res.food_purple_png);
+    }
+    else if(food_type == 1)
+    {
+        food[food_index] = new cc.Sprite(res.speed_up_png);
+    }
+
     food[food_index].setAnchorPoint(0.5, 0.5);
     food[food_index].setPosition(food_pos_x, food_pos_y);
     food[food_index].setTag(food_index);
