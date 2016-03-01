@@ -558,34 +558,12 @@ function gameOver(){
     label2.setColor(0,0,0);
     gameLayer.addChild(label2);
 
+
     var url = new cc.LabelTTF("http://tp.sojump.cn/jq/7123174.aspx", "Arial");
     url.setPosition(size.width/2 + 10, size.height/2 - 40);
     url.setFontSize(16);
     url.setColor(255,0,0);
     gameLayer.addChild(url);
-
-    var restartLabel = new cc.LabelTTF("Try again", "Verdana");
-    restartLabel.setPosition(size.width/2 - 110, size.height/2 - 110);
-    restartLabel.setFontSize(18);
-    restartLabel.setColor(0,0,0);
-    gameLayer.addChild(restartLabel);
-    /*
-     var restartLabel = new cc.MenuItemImage(
-        "res/continue_up.png",
-        "res/continue_down.png",
-         function () {
-            cc.log("restartLabel is clicked!");
-            cc.director.pushScene(new cc.TransitionFade(1.2,new GameScene()));
-         }, this);
-         restartLabel.x = size.width / 2;
-         restartLabel.y = size.height - 300;
-     */
-
-    var exitLabel = new cc.LabelTTF("Exit", "Verdana");
-    exitLabel.setPosition(size.width/2 + 120, size.height/2 - 110);
-    exitLabel.setFontSize(18);
-    exitLabel.setColor(0,0,0);
-    gameLayer.addChild(exitLabel);
     cc.eventManager.addListener({
         event: cc.EventListener.MOUSE,
         onMouseUp: function(event){
@@ -606,6 +584,69 @@ function gameOver(){
 
         }
     },url);
+
+
+    var restartLabel = new cc.LabelTTF("Try again", "Verdana");
+    restartLabel.setPosition(size.width/2 - 110, size.height/2 - 110);
+    restartLabel.setFontSize(18);
+    restartLabel.setColor(0,0,0);
+    gameLayer.addChild(restartLabel);
+    cc.eventManager.addListener({
+        event: cc.EventListener.MOUSE,
+        onMouseUp: function(event){
+            var pos = event.getLocation();
+            if(cc.rectContainsPoint(restartLabel.getBoundingBox(), pos)){
+                window.location.reload();
+            }
+
+        },
+        onMouseMove: function(event){
+            var pos = event.getLocation();
+            if(cc.rectContainsPoint(restartLabel.getBoundingBox(), pos)){
+                cc._canvas.style.cursor = 'pointer';
+            }
+            else{
+                cc._canvas.style.cursor = 'default';
+            }
+
+        }
+    },restartLabel);
+
+
+
+    var exitLabel = new cc.LabelTTF("Exit", "Verdana");
+    exitLabel.setPosition(size.width/2 + 120, size.height/2 - 110);
+    exitLabel.setFontSize(18);
+    exitLabel.setColor(0,0,0);
+    gameLayer.addChild(exitLabel);
+    cc.eventManager.addListener({
+        event: cc.EventListener.MOUSE,
+        onMouseUp: function(event){
+            var pos = event.getLocation();
+
+            if(cc.rectContainsPoint(exitLabel.getBoundingBox(), pos)){
+                
+                if(confirm("Are you sure exiting the game?")){
+                    window.open(location, '_self').close();                    
+                }else{
+                    history.back();
+                }
+               
+            }
+
+        },
+        onMouseMove: function(event){
+            var pos = event.getLocation();
+            if(cc.rectContainsPoint(exitLabel.getBoundingBox(), pos)){
+                cc._canvas.style.cursor = 'pointer';
+            }
+            else{
+                cc._canvas.style.cursor = 'default';
+            }
+
+        }
+    },exitLabel);
+
 
 }
 
