@@ -5,7 +5,7 @@ var REFRESH_TIME = 15;
 var INITIAL_SCORE = 10;
 var INITIAL_SPEED = 3;
 var REGULAR_UPDATES_RATE = 15;
-var POWER_UP_TIME = 10000;
+var POWER_UP_TIME = 5000;
 
 var gameLayer;
 var index = 0;
@@ -243,12 +243,16 @@ var GameLayer = cc.Layer.extend({
 
                     if(para.food_type == 1)
                     {
-                        isSpeedUp = true;
-                        speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
-                        window.setTimeout(function(){
-                            isSpeedUp = false;
-                            speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
-                        },POWER_UP_TIME);
+                    	if(isSpeedUp == false)
+                    	{
+                    		isSpeedUp = true;
+                        	speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
+                        	
+                        	window.setTimeout(function(){
+                            	isSpeedUp = false;
+                            	speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
+                        	},POWER_UP_TIME);
+                    	}
                     }
                 }
                 else{
