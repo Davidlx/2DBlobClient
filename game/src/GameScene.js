@@ -253,6 +253,7 @@ var GameLayer = cc.Layer.extend({
                             speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
                         },POWER_UP_TIME);
                     }
+                    /*
                     else if(para.food_type == 3)
                     {
                         if(isShrink == false){
@@ -267,7 +268,7 @@ var GameLayer = cc.Layer.extend({
                             },POWER_UP_TIME);
                         }
                         
-                    }
+                    }*/
                 }
                 else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
@@ -523,11 +524,14 @@ function calculatePlayerScale(score){
         scale = 100*0.003 + 500*0.0006;
     }
 
+    return scale;
+
+    /*
     if(isShrink == true){
         return scale*0.6;
     }else{
         return scale;
-    }
+    }*/
     
 }
 

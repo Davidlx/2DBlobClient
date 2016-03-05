@@ -23,7 +23,7 @@ var res = {
     blackBG_png:"res/blackBG.png",
     gameoverBox_png:"res/gameoverBox.png",
     speed_up_png:"res/speed_up.png",
-    shrink_png:"res/shrink.png"
+    shrink_png:"res/shrink.png",
     //continue_png:"res/continue.png"
 };
 
