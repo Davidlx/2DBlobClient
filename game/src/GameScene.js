@@ -254,6 +254,7 @@ var GameLayer = cc.Layer.extend({
                         	},POWER_UP_TIME);
                     	}
                     }
+
                 }
                 else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
@@ -441,6 +442,10 @@ function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y){
     else if(food_type == 1)
     {
         food[food_index] = new cc.Sprite(res.speed_up_png);
+    }
+    else if(food_type == 2)
+    {
+    	food[food_index] = new cc.Sprite(res.poison_png);
     }
 
     food[food_index].setAnchorPoint(0.5, 0.5);
