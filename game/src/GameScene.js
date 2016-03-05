@@ -24,6 +24,7 @@ var userLabels = [];
 var angle = 0;
 var speed = INITIAL_SPEED;
 var isSpeedUp = false;
+var isShrink = false;
 var userScore = [];
 var userStatus = [];
 var userPos = [];
@@ -36,6 +37,7 @@ var network = 1000;
 var networkLable;
 var latestTS = 0;
 
+
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
@@ -44,6 +46,7 @@ var GameLayer = cc.Layer.extend({
         //socket.emit('user_name','test');
         gameLayer=this;
          map = new cc.TMXTiledMap(res.map_tmx);
+
 
         socket.on('game_init_info',function(para){
             for(var i=0;i<para.name.length;i++){
@@ -250,6 +253,21 @@ var GameLayer = cc.Layer.extend({
                             speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
                         },POWER_UP_TIME);
                     }
+                    else if(para.food_type == 3)
+                    {
+                        if(isShrink == false){
+                            isShrink = true;
+                            ball.setScale(calculatePlayerScale(userScore[index]));
+                            users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
+
+                            window.setTimeout(function(){
+                                isShrink = false;
+                                ball.setScale(calculatePlayerScale(userScore[index]));
+                                users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
+                            },POWER_UP_TIME);
+                        }
+                        
+                    }
                 }
                 else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
@@ -438,6 +456,10 @@ function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y){
     {
         food[food_index] = new cc.Sprite(res.speed_up_png);
     }
+    else if(food_type == 3)
+    {
+        food[food_index] = new cc.Sprite(res.shrink_png);
+    }
 
     food[food_index].setAnchorPoint(0.5, 0.5);
     food[food_index].setPosition(food_pos_x, food_pos_y);
@@ -500,7 +522,13 @@ function calculatePlayerScale(score){
     else{
         scale = 100*0.003 + 500*0.0006;
     }
-    return scale;
+
+    if(isShrink == true){
+        return scale*0.6;
+    }else{
+        return scale;
+    }
+    
 }
 
 
