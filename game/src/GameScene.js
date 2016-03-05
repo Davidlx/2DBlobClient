@@ -231,6 +231,7 @@ var GameLayer = cc.Layer.extend({
                 map.removeChild(food[para.food_index], true);
                 userScore[para.index] = para.score;
                 if(para.index == index){
+
                     ball.setScale(calculatePlayerScale(userScore[index]));
                     speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
                     if(userNames[para.index].length>3){
@@ -241,6 +242,7 @@ var GameLayer = cc.Layer.extend({
                     }
                     scoreLabel.setString("Score: " + para.score);
 
+                	//Speed up
                     if(para.food_type == 1)
                     {
                     	if(isSpeedUp == false)
