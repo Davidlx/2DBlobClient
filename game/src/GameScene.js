@@ -24,6 +24,7 @@ var userLabels = [];
 var angle = 0;
 var speed = INITIAL_SPEED;
 var isSpeedUp = false;
+var isShrink = false;
 var userScore = [];
 var userStatus = [];
 var userPos = [];
@@ -256,6 +257,32 @@ var GameLayer = cc.Layer.extend({
                         	},POWER_UP_TIME);
                     	}
                     }
+                    else if(para.food_type == 3)
+                    {
+                        if(isShrink == false)
+                        {
+                            isShrink = true;
+                            ball.setScale(calculatePlayerScale(userScore[index]));
+                            if(userNames[para.index].length>3){
+                                userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
+                            }
+                            else{
+                                userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
+                            }
+                            //users[index].setScale(calculatePlayerScale(userScore[index]));
+
+                            window.setTimeout(function(){
+                                isShrink = false;
+                                ball.setScale(calculatePlayerScale(userScore[index]));
+                                if(userNames[para.index].length>3){
+                                    userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
+                                }
+                                else{
+                                    userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
+                                }
+                            },POWER_UP_TIME);
+                        }
+                    }
 
                 }
                 else{
@@ -449,6 +476,10 @@ function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y){
     {
     	food[food_index] = new cc.Sprite(res.poison_png);
     }
+    else if(food_type == 3)
+    {
+        food[food_index] = new cc.Sprite(res.shrink_png);
+    }
 
     food[food_index].setAnchorPoint(0.5, 0.5);
     food[food_index].setPosition(food_pos_x, food_pos_y);
@@ -511,7 +542,15 @@ function calculatePlayerScale(score){
     else{
         scale = 100*0.003 + 500*0.0006;
     }
-    return scale;
+    //return scale;
+
+    if(isShrink == true){
+        return scale*0.5;
+    }else{
+        return scale;
+    }
+
+
 }
 
 

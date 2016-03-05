@@ -24,6 +24,7 @@ var res = {
     gameoverBox_png:"res/gameoverBox.png",
     speed_up_png:"res/speed_up.png",
     poison_png:"res/poison.png",
+    shrink_png:"res/shrink.png",
     //continue_png:"res/continue.png"
 };
 
