@@ -5,7 +5,7 @@ var REFRESH_TIME = 15;
 var INITIAL_SCORE = 10;
 var INITIAL_SPEED = 3;
 var REGULAR_UPDATES_RATE = 15;
-var POWER_UP_TIME = 5000;
+var POWER_UP_TIME = 3000;
 
 var gameLayer;
 var index = 0;
@@ -24,6 +24,7 @@ var userLabels = [];
 var angle = 0;
 var speed = INITIAL_SPEED;
 var isSpeedUp = false;
+var isReverse = false;
 var userScore = [];
 var userStatus = [];
 var userPos = [];
@@ -254,6 +255,17 @@ var GameLayer = cc.Layer.extend({
                         	},POWER_UP_TIME);
                     	}
                     }
+                    if(para.food_type == 2)
+                    {
+                        if(isReverse == false)
+                        {
+                            isReverse = true;
+
+                            window.setTimeout(function(){
+                                isReverse = false;
+                            },POWER_UP_TIME);
+                        }
+                    }
                 }
                 else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
@@ -442,6 +454,10 @@ function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y){
     {
         food[food_index] = new cc.Sprite(res.speed_up_png);
     }
+    else if(food_type == 2)
+    {
+        food[food_index] = new cc.Sprite(res.reverse_png);
+    }
 
     food[food_index].setAnchorPoint(0.5, 0.5);
     food[food_index].setPosition(food_pos_x, food_pos_y);
@@ -468,7 +484,15 @@ function collisionDetection(player, sprite2) {
 }
 
 function calculateAngle(sourcePoint,targetPoint,angle){//ball - source, mouse - targetpoint
-    var tempAngle = (Math.atan2(targetPoint.y-sourcePoint.y,targetPoint.x-sourcePoint.x));
+    var tempAngle;
+    if(isReverse==false) {
+        tempAngle = (Math.atan2(targetPoint.y - sourcePoint.y, targetPoint.x - sourcePoint.x));
+    }else{
+        var reversePointX,reversePointY;
+        reversePointX = 2*sourcePoint.x - targetPoint.x;
+        reversePointY = 2*sourcePoint.y - targetPoint.y;
+        tempAngle = (Math.atan2(reversePointY - sourcePoint.y, reversePointX - sourcePoint.x));
+    }
     // if (tempAngle != angle) {
     //     //upload server - angle changed
     //     //console.log("angle changed");

@@ -23,6 +23,7 @@ var res = {
     blackBG_png:"res/blackBG.png",
     gameoverBox_png:"res/gameoverBox.png",
     speed_up_png:"res/speed_up.png",
+    reverse_png:"res/rever.png",
     //continue_png:"res/continue.png"
 };
 
