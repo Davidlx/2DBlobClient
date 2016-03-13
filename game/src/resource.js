@@ -8,6 +8,7 @@ var res = {
     first_bg_png : "res/first_bg.png",
     game_bg_png : "res/game_bg.png",
     ball_png : "res/ball.png",
+    AI_png :"res/AI.png",
     enemy_png : "res/enemy.png",
     food_red_png : "res/food_red.png",
     food_blue_png : "res/food_blue.png",

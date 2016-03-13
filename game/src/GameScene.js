@@ -84,11 +84,22 @@ var GameLayer = cc.Layer.extend({
 
             socket.on("User_Add", function(para){
                 lowLog("NEW USER ADD: "+para.index);
-                users[para.index] = new cc.Sprite(res.ball_png);
+                if(para.ai==true){
+                    console.log("AIIIIIIIIII");
+                    users[para.index] = new cc.Sprite(res.AI_png);
+                }
+                else{
+                    users[para.index] = new cc.Sprite(res.ball_png);
+                }
                 users[para.index].setAnchorPoint(0.5, 0.5);
                 users[para.index].setScale(calculatePlayerScale(INITIAL_SCORE));
                 users[para.index].setPosition(-1000,-1000);// make it outside the screen(there is a 1 second transiting animation)
-                userStatus[para.index]='running';
+                if(para.ai==true){
+                    userStatus[para.index]='AI';
+                }
+                else{
+                    userStatus[para.index]='running';
+                }
                 userNames[para.index]=para.name;
                 angles[para.index]=0;
                 map.addChild(users[para.index],0);
@@ -162,12 +173,16 @@ var GameLayer = cc.Layer.extend({
 
             //old users ball
             for(var i=0;i<index;i++){
-              users[i] = new cc.Sprite(res.ball_png);
+              if(userStatus[i] == 'AI'){
+                  users[i] = new cc.Sprite(res.AI_png);
+              }
+              else{
+                users[i] = new cc.Sprite(res.ball_png);
+              }
               users[i].setAnchorPoint(0.5, 0.5);
               users[i].setScale(calculatePlayerScale(userScore[i]));
               users[i].setPosition(userPos[i*2],userPos[i*2+1]);
-                if(userStatus[i]=='running'){
-
+                if(userStatus[i]!='not started'){
                     map.addChild(users[i],0);
                 }
             }
@@ -185,7 +200,7 @@ var GameLayer = cc.Layer.extend({
                     }
                     userLabels[i].setPosition(users[i].x, users[i].y);
                     userLabels[i].setColor(cc.color(0, 0, 0));
-                    if(userStatus[i]=='running'){
+                    if(userStatus[i]!='not started'){
                         map.addChild(userLabels[i], 0);
                     }
 
@@ -215,7 +230,7 @@ var GameLayer = cc.Layer.extend({
 
             window.setInterval(function () {
                 for (var i = 0; i < users.length; i++) {
-                    if(i!=index && userStatus[i]=='running') {
+                    if(i!=index && userStatus[i]!='not started') {
                         if(collisionDetection(ball, users[i])){
                             socket.emit('eat_user', index, getUserPosition()[0],getUserPosition()[1],i,getUNIXTimestamp());
                             HighLog("User Collision");
@@ -314,7 +329,6 @@ var GameLayer = cc.Layer.extend({
                 // if the food index and user index matched, then delete,
                 //new scores will be sent to you
                 HighLog("User Eat Received");
-
                 userScore[para.index] = para.score;
                 if(para.index == index){
                     ball.setScale(calculatePlayerScale(userScore[para.index]));
@@ -388,7 +402,7 @@ var GameLayer = cc.Layer.extend({
 
         socket.on('user_leave', function(para){
             lowLog("User "+para.index+" has left 281");
-            userStatus[para.index] = 'not running';
+            userStatus[para.index] = 'not started';
             map.removeChild(users[para.index],true);
             map.removeChild(userLabels[para.index],true);
             if(para.index==index){
