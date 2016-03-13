@@ -85,7 +85,6 @@ var GameLayer = cc.Layer.extend({
             socket.on("User_Add", function(para){
                 lowLog("NEW USER ADD: "+para.index);
                 if(para.ai==true){
-                    console.log("AIIIIIIIIII");
                     users[para.index] = new cc.Sprite(res.AI_png);
                 }
                 else{
@@ -232,7 +231,7 @@ var GameLayer = cc.Layer.extend({
                 for (var i = 0; i < users.length; i++) {
                     if(i!=index && userStatus[i]!='not started') {
                         if(collisionDetection(ball, users[i])){
-                            socket.emit('eat_user', index, getUserPosition()[0],getUserPosition()[1],i,getUNIXTimestamp());
+                            socket.emit('eat_user', index, getUserPosition()[0],getUserPosition()[1],i,ball.getScale(),users[i].getScale(),getUNIXTimestamp());
                             HighLog("User Collision");
                         }
 
@@ -279,6 +278,7 @@ var GameLayer = cc.Layer.extend({
                         {
                             isShrink = true;
                             ball.setScale(calculatePlayerScale(userScore[index]));
+                            socket.emit("update_scale", index, ball.getScale(),getUNIXTimestamp());
                             if(userNames[para.index].length>3){
                                 userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
                             }
@@ -296,6 +296,7 @@ var GameLayer = cc.Layer.extend({
                                 else{
                                     userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
                                 }
+                                socket.emit("update_scale", index, ball.getScale(),getUNIXTimestamp());
                             },POWER_UP_TIME);
                         }
                     }
@@ -383,6 +384,16 @@ var GameLayer = cc.Layer.extend({
 
         socket.on('update_score', function(para){
             users[para.index].score = para.score;
+        });
+
+        socket.on('scale_update', function(para){
+            users[para.index].setScale(para.scale);
+            if(userNames[para.index].length>3){
+                userLabels[para.index].setFontSize(ballSize / 2 * para.scale *(4/userNames[para.index].length));
+            }
+            else{
+                userLabels[para.index].setFontSize(ballSize / 2 * para.scale);
+            }
         });
 
         socket.on('updateAllUserLocation', function(para){
@@ -477,13 +488,6 @@ function move(ball, angle, speed){
     }
 }
 
-//add on the map via client
-function addFood(food_index, food_type){
-    var food_pos_x = Math.round(Math.random()*map.width);
-    var food_pos_y = Math.round(Math.random()*map.height);
-    addFoodOnMap(food_index, food_type, food_pos_x,food_pos_y)
-}
-
 //add food based on server response
 function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y) {
     if (food_type == 0) {
@@ -519,8 +523,8 @@ function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y) {
         size = cc.director.getWinSize();
         var radius1 = player.getScale() * ballSize / 2;
         var radius2 = sprite2.getScale();
-        var playerX = size.width / 2 - map.getPositionX();//mapCo_Player[0];
-        var playerY = size.height / 2 - map.getPositionY();//mapCo_Player[1];
+        var playerX = size.width / 2 - map.getPositionX();
+        var playerY = size.height / 2 - map.getPositionY();
         var sprite2X = sprite2.getPositionX();
         var sprite2Y = sprite2.getPositionY();
         var distanceX = sprite2X - playerX;
