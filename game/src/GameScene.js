@@ -40,6 +40,9 @@ var network = 1000;
 var networkLable;
 var latestTS = 0;
 
+var promptLabel;
+var ifPrompt = false;
+
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
@@ -299,38 +302,37 @@ var GameLayer = cc.Layer.extend({
                     }
                     scoreLabel.setString("Score: " + para.score);
 
-                	//Speed up
+                    //Speed up
                     if(para.food_type == 1)
                     {
-                    	if(isSpeedUp == false)
-                    	{                  
+                        if(isSpeedUp == false)
+                        {
                             isSpeedUp = true;
-                            
                             speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
-                            prompt = new cc.LabelTTF("Your speed increases!", "Arial");
-                            prompt.setPosition(size.width / 2, size.height -100);
-                            prompt.setFontSize(18);
-                            prompt.setColor(0, 0, 0);
-                            gameLayer.addChild(prompt);
-                            
+
                             window.setTimeout(function(){
-                                isSpeedUp = false;
-                                ifPrompt = true;
-                                speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
-                                gameLayer.removeChild(prompt);
+                                    isSpeedUp = false;
+                                    speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
                             },POWER_UP_TIME);
-                    	}
+
+                            if(ifPrompt == false){
+                                ifPrompt = true;
+                                promptLabel = displayPrompt(1);
+                            }else{
+                                gameLayer.removeChild(promptLabel);
+                                promptLabel = displayPrompt(1);
+                            }
+                        }
                     }
                     else if(para.food_type == 2){
-                        var prompt = new cc.LabelTTF("Your score decreases :(", "Arial");
-                        prompt.setPosition(size.width / 2, size.height -100);
-                        prompt.setFontSize(18);
-                        prompt.setColor(0, 0, 0);
-                        gameLayer.addChild(prompt);
+                        if(ifPrompt == false){
+                            ifPrompt = true;
+                            promptLabel = displayPrompt(2);
 
-                        window.setTimeout(function(){
-                            gameLayer.removeChild(prompt);
-                        },POWER_UP_TIME);
+                        }else{
+                            gameLayer.removeChild(promptLabel);
+                            promptLabel = displayPrompt(2);
+                        }
                     }
                     else if(para.food_type == 3)
                     {
@@ -347,12 +349,6 @@ var GameLayer = cc.Layer.extend({
                             }
                             //users[index].setScale(calculatePlayerScale(userScore[index]));
 
-                            var prompt = new cc.LabelTTF("You have been shrunk, RUN!", "Arial");
-                            prompt.setPosition(size.width / 2, size.height -100);
-                            prompt.setFontSize(18);
-                            prompt.setColor(0, 0, 0);
-                            gameLayer.addChild(prompt);
-
                             window.setTimeout(function(){
                                 isShrink = false;
                                 ball.setScale(calculatePlayerScale(userScore[index]));
@@ -363,8 +359,16 @@ var GameLayer = cc.Layer.extend({
                                     userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
                                 }
                                 socket.emit("update_scale", index, ball.getScale(),getUNIXTimestamp());
-                                gameLayer.removeChild(prompt);
                             },POWER_UP_TIME);
+
+                            if(ifPrompt == false){
+                                ifPrompt = true;
+                                promptLabel = displayPrompt(3);
+                            }else{
+                                gameLayer.removeChild(promptLabel);
+                                promptLabel = displayPrompt(3);
+                            }
+                            
                         }
                     }
 
@@ -374,16 +378,18 @@ var GameLayer = cc.Layer.extend({
                         {
                             isReverse = true;
 
-                            var prompt = new cc.LabelTTF("Your direction has been reversed!", "Arial");
-                            prompt.setPosition(size.width / 2, size.height -100);
-                            prompt.setFontSize(18);
-                            prompt.setColor(0, 0, 0);
-                            gameLayer.addChild(prompt);
-
                             window.setTimeout(function(){
                                 isReverse = false;
-                                gameLayer.removeChild(prompt);
+
                             },POWER_UP_TIME);
+
+                            if(ifPrompt == false){
+                                ifPrompt = true;
+                                promptLabel = displayPrompt(4);
+                            }else{
+                                gameLayer.removeChild(promptLabel);
+                                promptLabel = displayPrompt(4);
+                            }
                         }
                     }
 
@@ -665,6 +671,37 @@ function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y) {
         }
 
 
+    }
+
+
+    function displayPrompt(food_type){
+        var prompt;
+   
+        if (food_type == 1) {
+            prompt = new cc.LabelTTF("Your speed increases!", "Arial"); 
+        }
+        else if (food_type == 2) {
+            prompt = new cc.LabelTTF("Your score decreases :(", "Arial");
+        }
+        else if (food_type == 3) {
+            prompt = new cc.LabelTTF("You have been shrunk, RUN!", "Arial");
+        }
+        else if (food_type == 4) {
+            prompt = new cc.LabelTTF("Your direction has been reversed!", "Arial");
+        }
+
+        prompt.setPosition(size.width / 2, size.height -100);
+        prompt.setFontSize(18);
+        prompt.setColor(0, 0, 0);
+
+        gameLayer.addChild(prompt);
+
+        window.setTimeout(function(){
+            gameLayer.removeChild(prompt);
+            ifPrompt = false;
+        },POWER_UP_TIME);
+
+        return prompt;
     }
 
 
