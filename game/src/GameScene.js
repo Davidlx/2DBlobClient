@@ -33,6 +33,8 @@ var angles = [];
 var food_posi = [];
 var food_type = [];
 
+var foodBox;
+
 var scoreBox;
 var network = 1000;
 var networkLable;
@@ -147,10 +149,49 @@ var GameLayer = cc.Layer.extend({
             userLabels[index].setColor(cc.color(0, 0, 0));
             gameLayer.addChild(userLabels[index], 0);
 
+
+            foodBox = new cc.Sprite(res.scoreBox_png);
+            foodBox.setScaleX(1.2);
+            foodBox.setPosition(180, size.height - 80);
+            gameLayer.addChild(foodBox);
+
+            var foodLabel = new cc.LabelTTF("Special Food", "Arial");
+            foodLabel.setScale(1.5);
+            foodLabel.setPosition(180, size.height - 50);
+            gameLayer.addChild(foodLabel);
+
+            var speedupItem = new cc.Sprite(res.speed_up_png);
+            speedupItem.setPosition(50, size.height - 80);
+            gameLayer.addChild(speedupItem);
+            var speedupLabel = new cc.LabelTTF("Speed-up Food", "Arial");
+            speedupLabel.setPosition(120, size.height - 80);
+            gameLayer.addChild(speedupLabel);
+            
+            var poisonItem = new cc.Sprite(res.poison_png);
+            poisonItem.setPosition(220, size.height - 80);
+            gameLayer.addChild(poisonItem);
+            var poisonLabel = new cc.LabelTTF("Poison Food", "Arial");
+            poisonLabel.setPosition(280, size.height - 80);
+            gameLayer.addChild(poisonLabel);
+            
+            var shrinkItem = new cc.Sprite(res.shrink_png);
+            shrinkItem.setPosition(50, size.height - 100);
+            gameLayer.addChild(shrinkItem);
+            var shrinkLabel = new cc.LabelTTF("Shrink Food", "Arial");
+            shrinkLabel.setPosition(120, size.height - 100);
+            gameLayer.addChild(shrinkLabel);
+   
+            var reverseItem = new cc.Sprite(res.reverse_png);
+            reverseItem.setPosition(220, size.height - 100);
+            gameLayer.addChild(reverseItem);
+            var reverseLabel = new cc.LabelTTF("Reverse Food", "Arial");
+            reverseLabel.setPosition(280, size.height - 100);
+            gameLayer.addChild(reverseLabel);
+
+
             scoreBox = new cc.Sprite(res.scoreBox_png);
             scoreBox.setPosition(size.width - 180, 70);
             gameLayer.addChild(scoreBox);
-
 
             var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Arial");
             scoreLabel.setPosition(size.width - 180, 70);
@@ -262,20 +303,22 @@ var GameLayer = cc.Layer.extend({
                     if(para.food_type == 1)
                     {
                     	if(isSpeedUp == false)
-                    	{
-                    		isSpeedUp = true;
-                        	speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
-                            var prompt = new cc.LabelTTF("Your speed increases!", "Arial");
+                    	{                  
+                            isSpeedUp = true;
+                            
+                            speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
+                            prompt = new cc.LabelTTF("Your speed increases!", "Arial");
                             prompt.setPosition(size.width / 2, size.height -100);
                             prompt.setFontSize(18);
                             prompt.setColor(0, 0, 0);
                             gameLayer.addChild(prompt);
-                        	
-                        	window.setTimeout(function(){
-                            	isSpeedUp = false;
-                            	speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
+                            
+                            window.setTimeout(function(){
+                                isSpeedUp = false;
+                                ifPrompt = true;
+                                speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
                                 gameLayer.removeChild(prompt);
-                        	},POWER_UP_TIME);
+                            },POWER_UP_TIME);
                     	}
                     }
                     else if(para.food_type == 2){
@@ -540,11 +583,9 @@ function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y) {
     else if (food_type == 3) {
         food[food_index] = new cc.Sprite(res.shrink_png);
     }
-    else
-        if (food_type == 4) {
-            food[food_index] = new cc.Sprite(res.reverse_png);
-
-        }
+    else if (food_type == 4) {
+        food[food_index] = new cc.Sprite(res.reverse_png);
+    }
 
         food[food_index].setAnchorPoint(0.5, 0.5);
         food[food_index].setPosition(food_pos_x, food_pos_y);
