@@ -265,12 +265,29 @@ var GameLayer = cc.Layer.extend({
                     	{
                     		isSpeedUp = true;
                         	speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
+                            var prompt = new cc.LabelTTF("Your speed increases!", "Arial");
+                            prompt.setPosition(size.width / 2, size.height -100);
+                            prompt.setFontSize(18);
+                            prompt.setColor(0, 0, 0);
+                            gameLayer.addChild(prompt);
                         	
                         	window.setTimeout(function(){
                             	isSpeedUp = false;
                             	speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
+                                gameLayer.removeChild(prompt);
                         	},POWER_UP_TIME);
                     	}
+                    }
+                    else if(para.food_type == 2){
+                        var prompt = new cc.LabelTTF("Your score decreases :(", "Arial");
+                        prompt.setPosition(size.width / 2, size.height -100);
+                        prompt.setFontSize(18);
+                        prompt.setColor(0, 0, 0);
+                        gameLayer.addChild(prompt);
+
+                        window.setTimeout(function(){
+                            gameLayer.removeChild(prompt);
+                        },POWER_UP_TIME);
                     }
                     else if(para.food_type == 3)
                     {
@@ -287,6 +304,12 @@ var GameLayer = cc.Layer.extend({
                             }
                             //users[index].setScale(calculatePlayerScale(userScore[index]));
 
+                            var prompt = new cc.LabelTTF("You have been shrunk, RUN!", "Arial");
+                            prompt.setPosition(size.width / 2, size.height -100);
+                            prompt.setFontSize(18);
+                            prompt.setColor(0, 0, 0);
+                            gameLayer.addChild(prompt);
+
                             window.setTimeout(function(){
                                 isShrink = false;
                                 ball.setScale(calculatePlayerScale(userScore[index]));
@@ -297,6 +320,7 @@ var GameLayer = cc.Layer.extend({
                                     userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
                                 }
                                 socket.emit("update_scale", index, ball.getScale(),getUNIXTimestamp());
+                                gameLayer.removeChild(prompt);
                             },POWER_UP_TIME);
                         }
                     }
@@ -307,11 +331,20 @@ var GameLayer = cc.Layer.extend({
                         {
                             isReverse = true;
 
+                            var prompt = new cc.LabelTTF("Your direction has been reversed!", "Arial");
+                            prompt.setPosition(size.width / 2, size.height -100);
+                            prompt.setFontSize(18);
+                            prompt.setColor(0, 0, 0);
+                            gameLayer.addChild(prompt);
+
                             window.setTimeout(function(){
                                 isReverse = false;
+                                gameLayer.removeChild(prompt);
                             },POWER_UP_TIME);
                         }
                     }
+
+
                 }
                 else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
