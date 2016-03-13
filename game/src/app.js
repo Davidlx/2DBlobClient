@@ -16,6 +16,7 @@ var HelloWorldLayer = cc.Layer.extend({
         bg.x = size.width / 2;
         bg.y = size.height / 2;
         this.addChild(bg);
+
         
         var title = new cc.Sprite(res.title_png);
         title.x = size.width / 2+20;
@@ -53,6 +54,21 @@ var HelloWorldLayer = cc.Layer.extend({
         mu.x = 0;
         mu.y = 0;
         this.addChild(mu);
+
+        /*for(var i=0;i<3;i++)
+        {
+            if(i==0 || i ==2) {
+                //window.setTimeout(function(){
+                    bg.setTexture(res.about_bg_png);
+                //},3);
+            }
+            else if(i==3){
+                //window.setTimeout(function(){
+                    bg.setTexture(res.first_bg_png);
+                //},3);
+                i=0;
+            }
+        }*/
 
     },
 

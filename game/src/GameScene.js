@@ -5,7 +5,7 @@ var REFRESH_TIME = 15;
 var INITIAL_SCORE = 10;
 var INITIAL_SPEED = 3;
 var REGULAR_UPDATES_RATE = 15;
-var POWER_UP_TIME = 5000;
+var POWER_UP_TIME = 3000;
 
 var gameLayer;
 var index = 0;
@@ -25,6 +25,7 @@ var angle = 0;
 var speed = INITIAL_SPEED;
 var isSpeedUp = false;
 var isShrink = false;
+var isReverse = false;
 var userScore = [];
 var userStatus = [];
 var userPos = [];
@@ -284,6 +285,17 @@ var GameLayer = cc.Layer.extend({
                         }
                     }
 
+                    if(para.food_type == 4)
+                    {
+                        if(isReverse == false)
+                        {
+                            isReverse = true;
+
+                            window.setTimeout(function(){
+                                isReverse = false;
+                            },POWER_UP_TIME);
+                        }
+                    }
                 }
                 else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
@@ -459,211 +471,222 @@ function addFood(food_index, food_type){
 }
 
 //add food based on server response
-function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y){
-    if(food_type == 0)
-    {
-        var random_num = Math.round(Math.random()*3);
-        if(random_num == 0) food[food_index] = new cc.Sprite(res.food_red_png);
-        if(random_num == 1) food[food_index] = new cc.Sprite(res.food_blue_png);
-        if(random_num == 2) food[food_index] = new cc.Sprite(res.food_green_png);
-        if(random_num == 3) food[food_index] = new cc.Sprite(res.food_purple_png);
+function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y) {
+    if (food_type == 0) {
+        var random_num = Math.round(Math.random() * 3);
+        if (random_num == 0) food[food_index] = new cc.Sprite(res.food_red_png);
+        if (random_num == 1) food[food_index] = new cc.Sprite(res.food_blue_png);
+        if (random_num == 2) food[food_index] = new cc.Sprite(res.food_green_png);
+        if (random_num == 3) food[food_index] = new cc.Sprite(res.food_purple_png);
     }
-    else if(food_type == 1)
-    {
+    else if (food_type == 1) {
         food[food_index] = new cc.Sprite(res.speed_up_png);
     }
-    else if(food_type == 2)
-    {
-    	food[food_index] = new cc.Sprite(res.poison_png);
+
+    else if (food_type == 2) {
+        food[food_index] = new cc.Sprite(res.poison_png);
     }
-    else if(food_type == 3)
-    {
+    else if (food_type == 3) {
         food[food_index] = new cc.Sprite(res.shrink_png);
     }
-
-    food[food_index].setAnchorPoint(0.5, 0.5);
-    food[food_index].setPosition(food_pos_x, food_pos_y);
-    food[food_index].setTag(food_index);
-    map.addChild(food[food_index],0);
-}
-
-function collisionDetection(player, sprite2) {
-    size = cc.director.getWinSize();
-    var radius1 = player.getScale()*ballSize/2;
-    var radius2 = sprite2.getScale();
-    var playerX = size.width/2 - map.getPositionX();//mapCo_Player[0];
-    var playerY = size.height/2- map.getPositionY();//mapCo_Player[1];
-    var sprite2X = sprite2.getPositionX();
-    var sprite2Y = sprite2.getPositionY();
-    var distanceX = sprite2X - playerX;
-    var distanceY = sprite2Y - playerY;
-    var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-
-    if (distance < (radius1 + radius2))
-        return true;
     else
-        return false;
-}
+        if (food_type == 4) {
+            food[food_index] = new cc.Sprite(res.reverse_png);
 
-function calculateAngle(sourcePoint,targetPoint,angle){//ball - source, mouse - targetpoint
-    var tempAngle = (Math.atan2(targetPoint.y-sourcePoint.y,targetPoint.x-sourcePoint.x));
-    // if (tempAngle != angle) {
-    //     //upload server - angle changed
-    //     //console.log("angle changed");
-    //     socket.emit('update_user_direction',index,getUserPosition()[0],getUserPosition()[1],tempAngle,getUNIXTimestamp());
-    // }
-    return tempAngle;
-}
+        }
 
-function calculateSpeedAlgorithm(scale){
-    var speed;
-    if(isSpeedUp == true){
-        return INITIAL_SPEED * 2;
+        food[food_index].setAnchorPoint(0.5, 0.5);
+        food[food_index].setPosition(food_pos_x, food_pos_y);
+        food[food_index].setTag(food_index);
+        map.addChild(food[food_index], 0);
     }
-    else{
-        if(scale ==0.002*INITIAL_SCORE){
-            speed = INITIAL_SPEED;
+
+    function collisionDetection(player, sprite2) {
+        size = cc.director.getWinSize();
+        var radius1 = player.getScale() * ballSize / 2;
+        var radius2 = sprite2.getScale();
+        var playerX = size.width / 2 - map.getPositionX();//mapCo_Player[0];
+        var playerY = size.height / 2 - map.getPositionY();//mapCo_Player[1];
+        var sprite2X = sprite2.getPositionX();
+        var sprite2Y = sprite2.getPositionY();
+        var distanceX = sprite2X - playerX;
+        var distanceY = sprite2Y - playerY;
+        var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+        if (distance < (radius1 + radius2))
+            return true;
+        else
+            return false;
+    }
+
+    function calculateAngle(sourcePoint, targetPoint, angle) {//ball - source, mouse - targetpoint
+        var tempAngle;
+        if (isReverse == false) {
+            tempAngle = (Math.atan2(targetPoint.y - sourcePoint.y, targetPoint.x - sourcePoint.x));
+        } else {
+            var reversePointX, reversePointY;
+            reversePointX = 2 * sourcePoint.x - targetPoint.x;
+            reversePointY = 2 * sourcePoint.y - targetPoint.y;
+            tempAngle = (Math.atan2(reversePointY - sourcePoint.y, reversePointX - sourcePoint.x));
+        }
+        // if (tempAngle != angle) {
+        //     //upload server - angle changed
+        //     //console.log("angle changed");
+        //     socket.emit('update_user_direction',index,getUserPosition()[0],getUserPosition()[1],tempAngle,getUNIXTimestamp());
+        // }
+        return tempAngle;
+    }
+
+    function calculateSpeedAlgorithm(scale) {
+        var speed;
+        if (isSpeedUp == true) {
+            return INITIAL_SPEED * 2;
+        }
+        else {
+            if (scale == 0.002 * INITIAL_SCORE) {
+                speed = INITIAL_SPEED;
+                return speed;
+            }
+            var radius = (scale * 500) / 2;
+            speed = INITIAL_SPEED * (1 - radius * 0.0018);
             return speed;
         }
-        var radius = (scale*500)/2;
-        speed = INITIAL_SPEED *(1-radius*0.0018);
-        return speed;
-    }
-}
-
-function calculatePlayerScale(score){
-    var scale;
-    if(score<100){
-        scale = score*0.003;
-    }
-    else if(score<500){
-        scale = 100*0.003 + (score-100)*0.0006;
-    }
-    else{
-        scale = 100*0.003 + 500*0.0006;
-    }
-    //return scale;
-
-    if(isShrink == true){
-        return scale*0.5;
-    }else{
-        return scale;
     }
 
+    function calculatePlayerScale(score) {
+        var scale;
+        if (score < 100) {
+            scale = score * 0.003;
+        }
+        else if (score < 500) {
+            scale = 100 * 0.003 + (score - 100) * 0.0006;
+        }
+        else {
+            scale = 100 * 0.003 + 500 * 0.0006;
+        }
+        //return scale;
 
-}
+        if (isShrink == true) {
+            return scale * 0.5;
+        } else {
+            return scale;
+        }
 
 
-function map2screen(mapX, mapY){
-    var x = mapX + map.getPositionX();
-    var y = mapY + map.getPositionY();
-    return [x,y];
-}
+    }
 
-function screen2map(scrX, scrY){
-    var x = scrX - map.getPositionX();
-    var y = scrY - map.getPositionY();
-    return [x,y];
-}
 
-function getUserPosition(){
-    return screen2map(size.width/2, size.height/2);
-}
+    function map2screen(mapX, mapY) {
+        var x = mapX + map.getPositionX();
+        var y = mapY + map.getPositionY();
+        return [x, y];
+    }
 
-function getUNIXTimestamp(){
-    return Math.floor(Date.now());//change the server accordingly.
-}
+    function screen2map(scrX, scrY) {
+        var x = scrX - map.getPositionX();
+        var y = scrY - map.getPositionY();
+        return [x, y];
+    }
 
-function gameOver(){
-    var bg = new cc.Sprite(res.blackBG_png);
+    function getUserPosition() {
+        return screen2map(size.width / 2, size.height / 2);
+    }
 
-    bg.setPosition(size.width / 2, size.height / 2);
-    gameLayer.addChild(bg, 0);
+    function getUNIXTimestamp() {
+        return Math.floor(Date.now());//change the server accordingly.
+    }
 
-    var fade_action = cc.fadeIn(2);
+    function gameOver() {
+        var bg = new cc.Sprite(res.blackBG_png);
 
-    var box = new cc.Sprite(res.gameoverBox_png);
-    box.setPosition(size.width/2, size.height/2);
-    gameLayer.addChild(box, 0);
-    box.setOpacity(0);
-    box.runAction(fade_action);
+        bg.setPosition(size.width / 2, size.height / 2);
+        gameLayer.addChild(bg, 0);
 
-    var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Arial");
-    scoreLabel.setPosition(size.width/2 + 10, size.height/2 + 60);
-    scoreLabel.setFontSize(36);
-    scoreLabel.setColor(0,0,0);
-    gameLayer.addChild(scoreLabel);
+        var fade_action = cc.fadeIn(2);
 
-    /*
-    var label1 = new cc.LabelTTF("Did you enjoy the game?", "Arial");
-    label1.setPosition(size.width/2 + 10, size.height/2 - 20);
-    label1.setFontSize(20);
-    label1.setColor(0,0,0);
-    gameLayer.addChild(label1);
-    */
+        var box = new cc.Sprite(res.gameoverBox_png);
+        box.setPosition(size.width / 2, size.height / 2);
+        gameLayer.addChild(box, 0);
+        box.setOpacity(0);
+        box.runAction(fade_action);
 
-    var label2 = new cc.LabelTTF("Please fill in our questionnaire to help us make the game better!", "Arial");
-    label2.setPosition(size.width/2 + 10, size.height/2 - 20);
-    label2.setFontSize(18);
-    label2.setColor(0,0,0);
-    gameLayer.addChild(label2);
+        var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Arial");
+        scoreLabel.setPosition(size.width / 2 + 10, size.height / 2 + 60);
+        scoreLabel.setFontSize(36);
+        scoreLabel.setColor(0, 0, 0);
+        gameLayer.addChild(scoreLabel);
 
-    var url = new cc.LabelTTF("http://tp.sojump.cn/jq/7123174.aspx", "Arial");
-    url.setPosition(size.width/2 + 10, size.height/2 - 40);
-    url.setFontSize(16);
-    url.setColor(255,0,0);
-    gameLayer.addChild(url);
+        /*
+         var label1 = new cc.LabelTTF("Did you enjoy the game?", "Arial");
+         label1.setPosition(size.width/2 + 10, size.height/2 - 20);
+         label1.setFontSize(20);
+         label1.setColor(0,0,0);
+         gameLayer.addChild(label1);
+         */
 
-    var restartLabel = new cc.LabelTTF("Try again", "Verdana");
-    restartLabel.setPosition(size.width/2 - 110, size.height/2 - 110);
-    restartLabel.setFontSize(18);
-    restartLabel.setColor(0,0,0);
-    gameLayer.addChild(restartLabel);
-    /*
-     var restartLabel = new cc.MenuItemImage(
-        "res/continue_up.png",
-        "res/continue_down.png",
+        var label2 = new cc.LabelTTF("Please fill in our questionnaire to help us make the game better!", "Arial");
+        label2.setPosition(size.width / 2 + 10, size.height / 2 - 20);
+        label2.setFontSize(18);
+        label2.setColor(0, 0, 0);
+        gameLayer.addChild(label2);
+
+        var url = new cc.LabelTTF("http://tp.sojump.cn/jq/7123174.aspx", "Arial");
+        url.setPosition(size.width / 2 + 10, size.height / 2 - 40);
+        url.setFontSize(16);
+        url.setColor(255, 0, 0);
+        gameLayer.addChild(url);
+
+        var restartLabel = new cc.LabelTTF("Try again", "Verdana");
+        restartLabel.setPosition(size.width / 2 - 110, size.height / 2 - 110);
+        restartLabel.setFontSize(18);
+        restartLabel.setColor(0, 0, 0);
+        gameLayer.addChild(restartLabel);
+        /*
+         var restartLabel = new cc.MenuItemImage(
+         "res/continue_up.png",
+         "res/continue_down.png",
          function () {
-            cc.log("restartLabel is clicked!");
-            cc.director.pushScene(new cc.TransitionFade(1.2,new GameScene()));
+         cc.log("restartLabel is clicked!");
+         cc.director.pushScene(new cc.TransitionFade(1.2,new GameScene()));
          }, this);
          restartLabel.x = size.width / 2;
          restartLabel.y = size.height - 300;
-     */
+         */
 
-    var exitLabel = new cc.LabelTTF("Exit", "Verdana");
-    exitLabel.setPosition(size.width/2 + 120, size.height/2 - 110);
-    exitLabel.setFontSize(18);
-    exitLabel.setColor(0,0,0);
-    gameLayer.addChild(exitLabel);
-    cc.eventManager.addListener({
-        event: cc.EventListener.MOUSE,
-        onMouseUp: function(event){
-            var pos = event.getLocation();
-            if(cc.rectContainsPoint(url.getBoundingBox(), pos)){
-                window.location.href = "http://tp.sojump.cn/jq/7123174.aspx";
+        var exitLabel = new cc.LabelTTF("Exit", "Verdana");
+        exitLabel.setPosition(size.width / 2 + 120, size.height / 2 - 110);
+        exitLabel.setFontSize(18);
+        exitLabel.setColor(0, 0, 0);
+        gameLayer.addChild(exitLabel);
+        cc.eventManager.addListener({
+            event: cc.EventListener.MOUSE,
+            onMouseUp: function (event) {
+                var pos = event.getLocation();
+                if (cc.rectContainsPoint(url.getBoundingBox(), pos)) {
+                    window.location.href = "http://tp.sojump.cn/jq/7123174.aspx";
+                }
+
+            },
+            onMouseMove: function (event) {
+                var pos = event.getLocation();
+                if (cc.rectContainsPoint(url.getBoundingBox(), pos)) {
+                    cc._canvas.style.cursor = 'pointer';
+                }
+                else {
+                    cc._canvas.style.cursor = 'default';
+                }
+
             }
+        }, url);
 
-        },
-        onMouseMove: function(event){
-            var pos = event.getLocation();
-            if(cc.rectContainsPoint(url.getBoundingBox(), pos)){
-                cc._canvas.style.cursor = 'pointer';
-            }
-            else{
-                cc._canvas.style.cursor = 'default';
-            }
-
-        }
-    },url);
-
-}
+    }
 
 
-function lowLog(msg){
-    //console.log("Low Log: "+ msg);
-}
+    function lowLog(msg) {
+        //console.log("Low Log: "+ msg);
+    }
 
-function HighLog(msg){
-    //console.log("High Log: "+ msg);
-}
+    function HighLog(msg) {
+        //console.log("High Log: "+ msg);
+    }
+

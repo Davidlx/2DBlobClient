@@ -25,6 +25,7 @@ var res = {
     speed_up_png:"res/speed_up.png",
     poison_png:"res/poison.png",
     shrink_png:"res/shrink.png",
+    reverse_png:"res/rever.png",
     //continue_png:"res/continue.png"
 };
 
