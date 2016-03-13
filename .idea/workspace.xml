@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="988022ac-cb76-4bcb-9787-17ec87c58e6a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/game/src/GameScene.js" afterPath="$PROJECT_DIR$/game/src/GameScene.js" />
-    </list>
+    <list default="true" id="988022ac-cb76-4bcb-9787-17ec87c58e6a" name="Default" comment="" />
     <ignored path="2DBlobClient.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -76,8 +74,8 @@
       <file leaf-file-name="GameScene.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/game/src/GameScene.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.47579297">
-              <caret line="456" column="26" selection-start-line="456" selection-start-column="26" selection-end-line="456" selection-end-column="26" />
+            <state vertical-scroll-proportion="0.7762938">
+              <caret line="468" column="36" selection-start-line="468" selection-start-column="36" selection-end-line="468" selection-end-column="36" />
               <folding />
             </state>
           </provider>
@@ -735,8 +733,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/game/src/GameScene.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.47579297">
-          <caret line="456" column="26" selection-start-line="456" selection-start-column="26" selection-end-line="456" selection-end-column="26" />
+        <state vertical-scroll-proportion="0.7762938">
+          <caret line="468" column="36" selection-start-line="468" selection-start-column="36" selection-end-line="468" selection-end-column="36" />
           <folding />
         </state>
       </provider>
