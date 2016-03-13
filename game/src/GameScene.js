@@ -255,7 +255,7 @@ var GameLayer = cc.Layer.extend({
                         	},POWER_UP_TIME);
                     	}
                     }
-                    if(para.food_type == 2)
+                    if(para.food_type == 4)
                     {
                         if(isReverse == false)
                         {
@@ -454,7 +454,7 @@ function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y){
     {
         food[food_index] = new cc.Sprite(res.speed_up_png);
     }
-    else if(food_type == 2)
+    else if(food_type == 4)
     {
         food[food_index] = new cc.Sprite(res.reverse_png);
     }

@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="988022ac-cb76-4bcb-9787-17ec87c58e6a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/game/frameworks/cocos2d-html5/cocos2d/core/scenes/CCLoaderScene.js" afterPath="$PROJECT_DIR$/game/frameworks/cocos2d-html5/cocos2d/core/scenes/CCLoaderScene.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/game/src/app.js" afterPath="$PROJECT_DIR$/game/src/app.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/game/main.js" afterPath="$PROJECT_DIR$/game/main.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/game/project.json" afterPath="$PROJECT_DIR$/game/project.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/game/src/GameScene.js" afterPath="$PROJECT_DIR$/game/src/GameScene.js" />
     </list>
     <ignored path="2DBlobClient.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -57,11 +53,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="app.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/game/src/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.77205884">
-              <caret line="67" column="23" selection-start-line="67" selection-start-column="23" selection-end-line="67" selection-end-column="23" />
+            <state vertical-scroll-proportion="-1.1636363">
+              <caret line="64" column="26" selection-start-line="64" selection-start-column="26" selection-end-line="64" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -77,11 +73,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GameScene.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="GameScene.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/game/src/GameScene.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="254" column="45" selection-start-line="251" selection-start-column="28" selection-end-line="254" selection-end-column="45" />
+            <state vertical-scroll-proportion="0.47579297">
+              <caret line="456" column="26" selection-start-line="456" selection-start-column="26" selection-end-line="456" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -116,10 +112,10 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/game/src/resource.js" />
-        <option value="$PROJECT_DIR$/game/src/GameScene.js" />
         <option value="$PROJECT_DIR$/game/project.json" />
         <option value="$PROJECT_DIR$/game/main.js" />
         <option value="$PROJECT_DIR$/game/src/app.js" />
+        <option value="$PROJECT_DIR$/game/src/GameScene.js" />
       </list>
     </option>
   </component>
@@ -705,14 +701,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/game/src/GameScene.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="254" column="45" selection-start-line="251" selection-start-column="28" selection-end-line="254" selection-end-column="45" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/game/src/resource.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -739,8 +727,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/game/src/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.77205884">
-          <caret line="67" column="23" selection-start-line="67" selection-start-column="23" selection-end-line="67" selection-end-column="23" />
+        <state vertical-scroll-proportion="-1.1636363">
+          <caret line="64" column="26" selection-start-line="64" selection-start-column="26" selection-end-line="64" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/game/src/GameScene.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.47579297">
+          <caret line="456" column="26" selection-start-line="456" selection-start-column="26" selection-end-line="456" selection-end-column="26" />
           <folding />
         </state>
       </provider>
