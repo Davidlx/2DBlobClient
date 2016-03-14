@@ -352,6 +352,7 @@ var GameLayer = cc.Layer.extend({
                         {
                             isShrink = true;
                             ball.setScale(calculatePlayerScale(userScore[index]));
+                            speed = calculateSpeedAlgorithm(ball.getScale());
                             socket.emit("update_scale", index, ball.getScale(),getUNIXTimestamp());
                             if(userNames[para.index].length>3){
                                 userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
@@ -364,6 +365,7 @@ var GameLayer = cc.Layer.extend({
                             window.setTimeout(function(){
                                 isShrink = false;
                                 ball.setScale(calculatePlayerScale(userScore[index]));
+                                speed = calculateSpeedAlgorithm(ball.getScale());
                                 if(userNames[para.index].length>3){
                                     userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
                                 }
