@@ -44,6 +44,10 @@ var promptLabel;
 var promptBox;
 var ifPrompt = false;
 
+var urlAddress;
+var restartLabel;
+var exitLabel;
+
 var GameLayer = cc.Layer.extend({
 
         ctor: function(){
@@ -732,7 +736,7 @@ function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y) {
         prompt.setScaleY(0.7);
         prompt.setPosition(size.width / 2, size.height -230);
         prompt.setColor(cc.color(224,255,255));
-        prompt.setOpacity(50);
+        prompt.setOpacity(0);
 
         gameLayer.addChild(prompt);
 
@@ -779,74 +783,76 @@ function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y) {
         box.setOpacity(0);
         box.runAction(fade_action);
 
-        var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Arial");
+        var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Optima");
         scoreLabel.setPosition(size.width / 2 + 10, size.height / 2 + 60);
         scoreLabel.setFontSize(36);
         scoreLabel.setColor(0, 0, 0);
         gameLayer.addChild(scoreLabel);
 
-        /*
-         var label1 = new cc.LabelTTF("Did you enjoy the game?", "Arial");
-         label1.setPosition(size.width/2 + 10, size.height/2 - 20);
-         label1.setFontSize(20);
-         label1.setColor(0,0,0);
-         gameLayer.addChild(label1);
-         */
+        var label = new cc.LabelTTF("Please fill in our questionnaire to help us make the game better!", "Arial");
+        label.setPosition(size.width / 2 + 10, size.height / 2 - 10);
+        label.setFontSize(18);
+        label.setColor(0, 0, 0);
+        gameLayer.addChild(label);
 
-        var label2 = new cc.LabelTTF("Please fill in our questionnaire to help us make the game better!", "Arial");
-        label2.setPosition(size.width / 2 + 10, size.height / 2 - 20);
-        label2.setFontSize(18);
-        label2.setColor(0, 0, 0);
-        gameLayer.addChild(label2);
+        urlAddress = new cc.LabelTTF("http://tp.sojump.cn/jq/7123174.aspx", "Arial");
+        urlAddress.setPosition(size.width / 2 + 10, size.height / 2 - 40);
+        urlAddress.setFontSize(16);
+        urlAddress.setColor(cc.color(205,51,51));
+        gameLayer.addChild(urlAddress);
+        clickEvent(urlAddress);
 
-        var url = new cc.LabelTTF("http://tp.sojump.cn/jq/7123174.aspx", "Arial");
-        url.setPosition(size.width / 2 + 10, size.height / 2 - 40);
-        url.setFontSize(16);
-        url.setColor(255, 0, 0);
-        gameLayer.addChild(url);
-
-        var restartLabel = new cc.LabelTTF("Try again", "Verdana");
+        restartLabel = new cc.LabelTTF("Try again", "Verdana");
         restartLabel.setPosition(size.width / 2 - 110, size.height / 2 - 110);
         restartLabel.setFontSize(18);
         restartLabel.setColor(0, 0, 0);
         gameLayer.addChild(restartLabel);
-        /*
-         var restartLabel = new cc.MenuItemImage(
-         "res/continue_up.png",
-         "res/continue_down.png",
-         function () {
-         cc.log("restartLabel is clicked!");
-         cc.director.pushScene(new cc.TransitionFade(1.2,new GameScene()));
-         }, this);
-         restartLabel.x = size.width / 2;
-         restartLabel.y = size.height - 300;
-         */
-
-        var exitLabel = new cc.LabelTTF("Exit", "Verdana");
+        clickEvent(restartLabel);
+        
+        exitLabel = new cc.LabelTTF("Exit", "Verdana");
         exitLabel.setPosition(size.width / 2 + 120, size.height / 2 - 110);
         exitLabel.setFontSize(18);
-        exitLabel.setColor(0, 0, 0);
+        exitLabel.setColor(0,0,0);
         gameLayer.addChild(exitLabel);
+        clickEvent(exitLabel);
+    }
+
+    function clickEvent(clickLabel){
         cc.eventManager.addListener({
             event: cc.EventListener.MOUSE,
-            onMouseUp: function (event) {
-                var pos = event.getLocation();
-                if (cc.rectContainsPoint(url.getBoundingBox(), pos)) {
-                    window.location.href = "http://tp.sojump.cn/jq/7123174.aspx";
-                }
-
-            },
+            eventName: "clickOnLabel",
             onMouseMove: function (event) {
                 var pos = event.getLocation();
-                if (cc.rectContainsPoint(url.getBoundingBox(), pos)) {
+                if (cc.rectContainsPoint(clickLabel.getBoundingBox(), pos)) {
                     cc._canvas.style.cursor = 'pointer';
                 }
                 else {
                     cc._canvas.style.cursor = 'default';
                 }
 
-            }
-        }, url);
+            },
+            onMouseUp: function (event) {
+                var pos = event.getLocation();
+                if (cc.rectContainsPoint(clickLabel.getBoundingBox(), pos)) {
+                    if(clickLabel == urlAddress){
+                        window.location.href = "http://tp.sojump.cn/jq/7123174.aspx";
+                    }else if(clickLabel == restartLabel){
+                        window.location.reload();
+                        /*
+                        window.onbeforeunload = function(){
+                            return "You have chosen to play again";
+                        };*/
+                    }else if(clickLabel == exitLabel){
+                        window.location.href = "about:blank";
+                        /*
+                        window.open('','_self','');
+                        window.close();
+                        */
+                    }
+                   
+                }
+            }       
+        }, clickLabel);
 
     }
 
