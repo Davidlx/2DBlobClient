@@ -41,6 +41,7 @@ var networkLable;
 var latestTS = 0;
 
 var promptLabel;
+var promptBox;
 var ifPrompt = false;
 
 var GameLayer = cc.Layer.extend({
@@ -156,39 +157,45 @@ var GameLayer = cc.Layer.extend({
             foodBox = new cc.Sprite(res.scoreBox_png);
             foodBox.setScaleX(1.2);
             foodBox.setPosition(180, size.height - 80);
+            foodBox.setOpacity(10);
             gameLayer.addChild(foodBox);
 
-            var foodLabel = new cc.LabelTTF("Special Food", "Arial");
+            var foodLabel = new cc.LabelTTF("Special Food", "Verdana");
             foodLabel.setScale(1.5);
             foodLabel.setPosition(180, size.height - 50);
+            foodLabel.setColor(cc.color(47,79,79));
             gameLayer.addChild(foodLabel);
 
             var speedupItem = new cc.Sprite(res.speed_up_png);
             speedupItem.setPosition(50, size.height - 80);
             gameLayer.addChild(speedupItem);
-            var speedupLabel = new cc.LabelTTF("Speed-up Food", "Arial");
+            var speedupLabel = new cc.LabelTTF("Speed-up Food", "Optima");
             speedupLabel.setPosition(120, size.height - 80);
+            speedupLabel.setColor(cc.color(47,79,79));
             gameLayer.addChild(speedupLabel);
             
             var poisonItem = new cc.Sprite(res.poison_png);
             poisonItem.setPosition(220, size.height - 80);
             gameLayer.addChild(poisonItem);
-            var poisonLabel = new cc.LabelTTF("Poison Food", "Arial");
+            var poisonLabel = new cc.LabelTTF("Poison Food", "Optima");
             poisonLabel.setPosition(280, size.height - 80);
+            poisonLabel.setColor(cc.color(47,79,79));
             gameLayer.addChild(poisonLabel);
             
             var shrinkItem = new cc.Sprite(res.shrink_png);
             shrinkItem.setPosition(50, size.height - 100);
             gameLayer.addChild(shrinkItem);
-            var shrinkLabel = new cc.LabelTTF("Shrink Food", "Arial");
+            var shrinkLabel = new cc.LabelTTF("Shrink Food", "Optima");
             shrinkLabel.setPosition(120, size.height - 100);
+            shrinkLabel.setColor(cc.color(47,79,79));
             gameLayer.addChild(shrinkLabel);
    
             var reverseItem = new cc.Sprite(res.reverse_png);
             reverseItem.setPosition(220, size.height - 100);
             gameLayer.addChild(reverseItem);
-            var reverseLabel = new cc.LabelTTF("Reverse Food", "Arial");
+            var reverseLabel = new cc.LabelTTF("Reverse Food", "Optima");
             reverseLabel.setPosition(280, size.height - 100);
+            reverseLabel.setColor(cc.color(47,79,79));
             gameLayer.addChild(reverseLabel);
 
 
@@ -318,9 +325,12 @@ var GameLayer = cc.Layer.extend({
                             if(ifPrompt == false){
                                 ifPrompt = true;
                                 promptLabel = displayPrompt(1);
+                                promptBox = displayPromptBox();
                             }else{
                                 gameLayer.removeChild(promptLabel);
+                                gameLayer.removeChild(promptBox);
                                 promptLabel = displayPrompt(1);
+                                promptBox = displayPromptBox();
                             }
                         }
                     }
@@ -328,10 +338,12 @@ var GameLayer = cc.Layer.extend({
                         if(ifPrompt == false){
                             ifPrompt = true;
                             promptLabel = displayPrompt(2);
-
+                            promptBox = displayPromptBox();
                         }else{
                             gameLayer.removeChild(promptLabel);
+                            gameLayer.removeChild(promptBox);
                             promptLabel = displayPrompt(2);
+                            promptBox = displayPromptBox();
                         }
                     }
                     else if(para.food_type == 3)
@@ -364,9 +376,12 @@ var GameLayer = cc.Layer.extend({
                             if(ifPrompt == false){
                                 ifPrompt = true;
                                 promptLabel = displayPrompt(3);
+                                promptBox = displayPromptBox();
                             }else{
                                 gameLayer.removeChild(promptLabel);
+                                gameLayer.removeChild(promptBox);
                                 promptLabel = displayPrompt(3);
+                                promptBox = displayPromptBox();
                             }
                             
                         }
@@ -386,9 +401,12 @@ var GameLayer = cc.Layer.extend({
                             if(ifPrompt == false){
                                 ifPrompt = true;
                                 promptLabel = displayPrompt(4);
+                                promptBox = displayPromptBox();
                             }else{
                                 gameLayer.removeChild(promptLabel);
+                                gameLayer.removeChild(promptBox);
                                 promptLabel = displayPrompt(4);
+                                promptBox = displayPromptBox();
                             }
                         }
                     }
@@ -678,21 +696,41 @@ function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y) {
         var prompt;
    
         if (food_type == 1) {
-            prompt = new cc.LabelTTF("Your speed increases!", "Arial"); 
+            prompt = new cc.LabelTTF("Your speed increases!", "Inconsolata"); 
         }
         else if (food_type == 2) {
-            prompt = new cc.LabelTTF("Your score decreases :(", "Arial");
+            prompt = new cc.LabelTTF("Your score decreases :(", "Inconsolata");
         }
         else if (food_type == 3) {
-            prompt = new cc.LabelTTF("You have been shrunk, RUN!", "Arial");
+            prompt = new cc.LabelTTF("You have been shrunk, RUN!", "Inconsolata");
         }
         else if (food_type == 4) {
-            prompt = new cc.LabelTTF("Your direction has been reversed!", "Arial");
+            prompt = new cc.LabelTTF("Your direction has been reversed!", "Inconsolata");
         }
 
-        prompt.setPosition(size.width / 2, size.height -100);
-        prompt.setFontSize(18);
-        prompt.setColor(0, 0, 0);
+        prompt.setPosition(size.width / 2, size.height -230);
+        prompt.setFontSize(22);
+        prompt.setColor(cc.color(205,51,51));
+
+        gameLayer.addChild(prompt);
+
+        window.setTimeout(function(){
+            gameLayer.removeChild(prompt);
+            ifPrompt = false;
+        },POWER_UP_TIME);
+
+        return prompt;
+    }
+
+    function displayPromptBox(){
+        var prompt;
+
+        prompt = new cc.Sprite(res.scoreBox_png);
+        prompt.setScaleX(1.2);
+        prompt.setScaleY(0.7);
+        prompt.setPosition(size.width / 2, size.height -230);
+        prompt.setColor(cc.color(224,255,255));
+        prompt.setOpacity(50);
 
         gameLayer.addChild(prompt);
 
