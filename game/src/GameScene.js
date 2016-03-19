@@ -11,12 +11,16 @@ var gameLayer;
 var index = 0;
 var size;
 var map;
+var ball;
 var ballSize;
 var food = [];
 var mousePos;
+var scr_userSpawnPosX;
+var scr_userSpawnPosY;
 var map_userSpawnPosX=0;
 var map_userSpawnPosY=0;
 var stop = false;
+var scoreLabel;
 
 var users = [];
 var userNames = [];
@@ -57,30 +61,7 @@ var GameLayer = cc.Layer.extend({
         gameLayer=this;
          map = new cc.TMXTiledMap(res.map_tmx);
 
-        socket.on('game_init_info',function(para){
-            for(var i=0;i<para.name.length;i++){
-                userNames[i] = para.name[i];
-            }
-            for(var i=0;i<para.score.length;i++){
-                userScore[i] = para.score[i];
-            }
-            for(var i=0;i<para.status.length;i++){
-                userStatus[i] = para.status[i];
-            }
-            for(var i=0;i<para.position.length;i+=2){
-                userPos[i] = para.position[i];
-                userPos[i+1] = para.position[i+1];
-            }
-            /*for(var i=0;i<para.food_type.length;i++){
-                food_type[i] = para.food_type[i];
-            }*/
-            for(var i=0;i<para.food.length;i+=2){
-                food_posi[i] = para.food[i];
-                food_posi[i+1] = para.food[i+1];
-                food_type[i] = para.food_type[i];
-                addFoodOnMap(i/2,para.food_type[i/2],para.food[i],para.food[i+1]);
-            }
-        });
+        socket.on('game_init_info',function(para){gameinit(para)});
 
 
         socket.on('user_initial_position',function(x,y){
@@ -92,51 +73,17 @@ var GameLayer = cc.Layer.extend({
             gameLayer.addChild(map, 0);
 
 
-            socket.on("User_Add", function(para){
-                lowLog("NEW USER ADD: "+para.index);
-                if(para.ai==true){
-                    users[para.index] = new cc.Sprite(res.AI_png);
-                }
-                else{
-                    users[para.index] = new cc.Sprite(res.ball_png);
-                }
-                users[para.index].setAnchorPoint(0.5, 0.5);
-                users[para.index].setScale(calculatePlayerScale(INITIAL_SCORE));
-                users[para.index].setPosition(-1000,-1000);// make it outside the screen(there is a 1 second transiting animation)
-                if(para.ai==true){
-                    userStatus[para.index]='AI';
-                }
-                else{
-                    userStatus[para.index]='running';
-                }
-                userNames[para.index]=para.name;
-                angles[para.index]=0;
-                map.addChild(users[para.index],0);
+            socket.on("User_Add", function(para){useradd(para)});
 
-                userLabels[para.index] = new cc.LabelTTF(para.name, "Arial");
-                userLabels[para.index].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-                userLabels[para.index].setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-                userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(INITIAL_SCORE)*(4/userNames[para.index].length));
-                userLabels[para.index].setPosition(users[para.index].x, users[para.index].y);
-                userLabels[para.index].setColor(cc.color(0, 0, 0));
-                map.addChild(userLabels[para.index], 0);
-
-            });
-
-            socket.on('food_add', function(para){
-                food_posi[para.food_index*2] = para.posi_x;
-                food_posi[para.food_index*2+2] = para.posi_y;
-                food_type[para.food_index] = para.food_type;
-                addFoodOnMap(para.food_index,para.food_type[para.food_index], para.posi_x,para.posi_y);
-            });
+            socket.on('food_add', function(para){foodadd(para)});
 
 
-            var ball = new cc.Sprite(res.ball_png);
+            ball = new cc.Sprite(res.ball_png);
             ball.setAnchorPoint(0.5, 0.5);
 
             // set map position
-            var scr_userSpawnPosX = size.width / 2 - map_userSpawnPosX;
-            var scr_userSpawnPosY = size.height / 2 - map_userSpawnPosY;
+            scr_userSpawnPosX = size.width / 2 - map_userSpawnPosX;
+            scr_userSpawnPosY = size.height / 2 - map_userSpawnPosY;
 
             ball.setPosition(size.width / 2, size.height / 2);
             map.setPosition(scr_userSpawnPosX, scr_userSpawnPosY);
@@ -158,56 +105,15 @@ var GameLayer = cc.Layer.extend({
             gameLayer.addChild(userLabels[index], 0);
 
 
-            foodBox = new cc.Sprite(res.scoreBox_png);
-            foodBox.setScaleX(1.2);
-            foodBox.setPosition(180, size.height - 80);
-            foodBox.setOpacity(10);
-            gameLayer.addChild(foodBox);
+            foodbox();
 
-            var foodLabel = new cc.LabelTTF("Special Food", "Verdana");
-            foodLabel.setScale(1.5);
-            foodLabel.setPosition(180, size.height - 50);
-            foodLabel.setColor(cc.color(47,79,79));
-            gameLayer.addChild(foodLabel);
-
-            var speedupItem = new cc.Sprite(res.speed_up_png);
-            speedupItem.setPosition(50, size.height - 80);
-            gameLayer.addChild(speedupItem);
-            var speedupLabel = new cc.LabelTTF("Speed-up Food", "Optima");
-            speedupLabel.setPosition(120, size.height - 80);
-            speedupLabel.setColor(cc.color(47,79,79));
-            gameLayer.addChild(speedupLabel);
-            
-            var poisonItem = new cc.Sprite(res.poison_png);
-            poisonItem.setPosition(220, size.height - 80);
-            gameLayer.addChild(poisonItem);
-            var poisonLabel = new cc.LabelTTF("Poison Food", "Optima");
-            poisonLabel.setPosition(280, size.height - 80);
-            poisonLabel.setColor(cc.color(47,79,79));
-            gameLayer.addChild(poisonLabel);
-            
-            var shrinkItem = new cc.Sprite(res.shrink_png);
-            shrinkItem.setPosition(50, size.height - 100);
-            gameLayer.addChild(shrinkItem);
-            var shrinkLabel = new cc.LabelTTF("Shrink Food", "Optima");
-            shrinkLabel.setPosition(120, size.height - 100);
-            shrinkLabel.setColor(cc.color(47,79,79));
-            gameLayer.addChild(shrinkLabel);
-   
-            var reverseItem = new cc.Sprite(res.reverse_png);
-            reverseItem.setPosition(220, size.height - 100);
-            gameLayer.addChild(reverseItem);
-            var reverseLabel = new cc.LabelTTF("Reverse Food", "Optima");
-            reverseLabel.setPosition(280, size.height - 100);
-            reverseLabel.setColor(cc.color(47,79,79));
-            gameLayer.addChild(reverseLabel);
-
+            specialfood();
 
             scoreBox = new cc.Sprite(res.scoreBox_png);
             scoreBox.setPosition(size.width - 180, 70);
             gameLayer.addChild(scoreBox);
 
-            var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Arial");
+            scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Arial");
             scoreLabel.setPosition(size.width - 180, 70);
             gameLayer.addChild(scoreLabel);
 
@@ -217,7 +123,7 @@ var GameLayer = cc.Layer.extend({
 
             cc.eventManager.addListener({
                 event: cc.EventListener.MOUSE,
-                onMouseMove: function (event) {
+                onMouseMove: function (event){
                     //change when have a new map
                     mousePos = event.getLocation();
                 }
@@ -226,40 +132,7 @@ var GameLayer = cc.Layer.extend({
 
 
             //old users ball
-            for(var i=0;i<index;i++){
-              if(userStatus[i] == 'AI'){
-                  users[i] = new cc.Sprite(res.AI_png);
-              }
-              else{
-                users[i] = new cc.Sprite(res.ball_png);
-              }
-              users[i].setAnchorPoint(0.5, 0.5);
-              users[i].setScale(calculatePlayerScale(userScore[i]));
-              users[i].setPosition(userPos[i*2],userPos[i*2+1]);
-                if(userStatus[i]!='not started'){
-                    map.addChild(users[i],0);
-                }
-            }
-            //old users label
-            for(var i=0; i<userNames.length; i++){
-                if(i!=index){
-                    userLabels[i] = new cc.LabelTTF(userNames[i], "Arial");
-                    userLabels[i].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-                    userLabels[i].setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-                    if(userNames[i].length>3){
-                        userLabels[i].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[i])*(4/userNames[i].length));
-                    }
-                    else{
-                        userLabels[i].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[i]));
-                    }
-                    userLabels[i].setPosition(users[i].x, users[i].y);
-                    userLabels[i].setColor(cc.color(0, 0, 0));
-                    if(userStatus[i]!='not started'){
-                        map.addChild(userLabels[i], 0);
-                    }
-
-                }
-            }
+            olduser();
             //update speed and angle
             window.setInterval(function () {
                 if(stop){move(ball,0,0);}
@@ -294,183 +167,10 @@ var GameLayer = cc.Layer.extend({
                 }
             },REFRESH_TIME);
 
-            socket.on('food_eat_succ', function(para){
-                //any user who have eat a food will cause this.
-                // if the food index and user index matched, then delete,
-                //new scores will be sent to you
-                HighLog("Food Eat Received");
-                map.removeChild(food[para.food_index], true);
-                userScore[para.index] = para.score;
-                if(para.index == index){
-
-                    ball.setScale(calculatePlayerScale(userScore[index]));
-                    speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
-                    if(userNames[para.index].length>3){
-                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
-                    }
-                    else{
-                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
-                    }
-                    scoreLabel.setString("Score: " + para.score);
-
-                    //Speed up
-                    if(para.food_type == 1)
-                    {
-                        if(isSpeedUp == false)
-                        {
-                            isSpeedUp = true;
-                            speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
-
-                            window.setTimeout(function(){
-                                    isSpeedUp = false;
-                                    speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
-                            },POWER_UP_TIME);
-
-                            if(ifPrompt == false){
-                                ifPrompt = true;
-                                promptLabel = displayPrompt(1);
-                                promptBox = displayPromptBox();
-                            }else{
-                                gameLayer.removeChild(promptLabel);
-                                gameLayer.removeChild(promptBox);
-                                promptLabel = displayPrompt(1);
-                                promptBox = displayPromptBox();
-                            }
-                        }
-                    }
-                    else if(para.food_type == 2){
-                        if(ifPrompt == false){
-                            ifPrompt = true;
-                            promptLabel = displayPrompt(2);
-                            promptBox = displayPromptBox();
-                        }else{
-                            gameLayer.removeChild(promptLabel);
-                            gameLayer.removeChild(promptBox);
-                            promptLabel = displayPrompt(2);
-                            promptBox = displayPromptBox();
-                        }
-                    }
-                    else if(para.food_type == 3)
-                    {
-                        if(isShrink == false)
-                        {
-                            isShrink = true;
-                            ball.setScale(calculatePlayerScale(userScore[index]));
-                            speed = calculateSpeedAlgorithm(ball.getScale());
-                            socket.emit("update_scale", index, ball.getScale(),getUNIXTimestamp());
-                            if(userNames[para.index].length>3){
-                                userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
-                            }
-                            else{
-                                userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
-                            }
-                            //users[index].setScale(calculatePlayerScale(userScore[index]));
-
-                            window.setTimeout(function(){
-                                isShrink = false;
-                                ball.setScale(calculatePlayerScale(userScore[index]));
-                                speed = calculateSpeedAlgorithm(ball.getScale());
-                                if(userNames[para.index].length>3){
-                                    userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
-                                }
-                                else{
-                                    userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
-                                }
-                                socket.emit("update_scale", index, ball.getScale(),getUNIXTimestamp());
-                            },POWER_UP_TIME);
-
-                            if(ifPrompt == false){
-                                ifPrompt = true;
-                                promptLabel = displayPrompt(3);
-                                promptBox = displayPromptBox();
-                            }else{
-                                gameLayer.removeChild(promptLabel);
-                                gameLayer.removeChild(promptBox);
-                                promptLabel = displayPrompt(3);
-                                promptBox = displayPromptBox();
-                            }
-                            
-                        }
-                    }
-
-                    if(para.food_type == 4)
-                    {
-                        if(isReverse == false)
-                        {
-                            isReverse = true;
-
-                            window.setTimeout(function(){
-                                isReverse = false;
-
-                            },POWER_UP_TIME);
-
-                            if(ifPrompt == false){
-                                ifPrompt = true;
-                                promptLabel = displayPrompt(4);
-                                promptBox = displayPromptBox();
-                            }else{
-                                gameLayer.removeChild(promptLabel);
-                                gameLayer.removeChild(promptBox);
-                                promptLabel = displayPrompt(4);
-                                promptBox = displayPromptBox();
-                            }
-                        }
-                    }
+            socket.on('food_eat_succ', function(para){food_eat(para)});
 
 
-                }
-                else{
-                    users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
-                    if(userNames[para.index].length>3){
-                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
-                    }
-                    else{
-                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
-                    }
-                }
-            });
-
-
-            socket.on('user_eat_succ', function(para){
-                //any user who have eat a food will cause this.
-                // if the food index and user index matched, then delete,
-                //new scores will be sent to you
-                HighLog("User Eat Received");
-                userScore[para.index] = para.score;
-                if(para.index == index){
-                    ball.setScale(calculatePlayerScale(userScore[para.index]));
-                    speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
-                    if(userNames[para.index].length>3){
-                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
-                    }
-                    else{
-                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
-                    }
-                    lowLog("YOU HAVE EATEN A USER!");
-                }else{
-                    users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
-                    if(userNames[para.index].length>3){
-                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
-                    }
-                    else{
-                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
-                    }
-                }
-                if(para.user_index==index){
-                    gameOver();
-                }else{
-                    map.removeChild(users[para.user_index],true);
-                    map.removeChild(userLabels[para.user_index],true);
-                }
-
-                //users.splice(para.user_index,1);
-                //userNames.splice(para.user_index,1);
-                //userScore.splice(index,1);
-                //userSpeed.splice(para.user_index,1);
-                //userStatus.splice(para.user_index,1);
-                //userPos.splice(para.user_index*2,1);
-                //userPos.splice(para.user_index*2+1,1);
-            });
+            socket.on('user_eat_succ', function(para){user_eat(para)});
 
             //regular updates
             window.setInterval(function () {
@@ -783,7 +483,7 @@ function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y) {
         box.setOpacity(0);
         box.runAction(fade_action);
 
-        var scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Optima");
+        scoreLabel = new cc.LabelTTF("Score : " + userScore[index], "Optima");
         scoreLabel.setPosition(size.width / 2 + 10, size.height / 2 + 60);
         scoreLabel.setFontSize(36);
         scoreLabel.setColor(0, 0, 0);
@@ -856,6 +556,319 @@ function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y) {
 
     }
 
+    function gameinit(para){
+        for(var i=0;i<para.name.length;i++){
+            userNames[i] = para.name[i];
+        }
+        for(var i=0;i<para.score.length;i++){
+            userScore[i] = para.score[i];
+        }
+        for(var i=0;i<para.status.length;i++){
+            userStatus[i] = para.status[i];
+        }
+        for(var i=0;i<para.position.length;i+=2){
+            userPos[i] = para.position[i];
+            userPos[i+1] = para.position[i+1];
+        }
+        /*for(var i=0;i<para.food_type.length;i++){
+         food_type[i] = para.food_type[i];
+         }*/
+        for(var i=0;i<para.food.length;i+=2){
+            food_posi[i] = para.food[i];
+            food_posi[i+1] = para.food[i+1];
+            food_type[i] = para.food_type[i];
+            addFoodOnMap(i/2,para.food_type[i/2],para.food[i],para.food[i+1]);
+        }
+    }
+
+    function useradd(para){
+        lowLog("NEW USER ADD: "+para.index);
+        if(para.ai==true){
+            users[para.index] = new cc.Sprite(res.AI_png);
+        }
+        else{
+            users[para.index] = new cc.Sprite(res.ball_png);
+        }
+        users[para.index].setAnchorPoint(0.5, 0.5);
+        users[para.index].setScale(calculatePlayerScale(INITIAL_SCORE));
+        users[para.index].setPosition(-1000,-1000);// make it outside the screen(there is a 1 second transiting animation)
+        if(para.ai==true){
+            userStatus[para.index]='AI';
+        }
+        else{
+            userStatus[para.index]='running';
+        }
+        userNames[para.index]=para.name;
+        angles[para.index]=0;
+        map.addChild(users[para.index],0);
+
+        userLabels[para.index] = new cc.LabelTTF(para.name, "Arial");
+        userLabels[para.index].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+        userLabels[para.index].setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(INITIAL_SCORE)*(4/userNames[para.index].length));
+        userLabels[para.index].setPosition(users[para.index].x, users[para.index].y);
+        userLabels[para.index].setColor(cc.color(0, 0, 0));
+        map.addChild(userLabels[para.index], 0);
+    }
+
+    function foodadd(para){
+        food_posi[para.food_index*2] = para.posi_x;
+        food_posi[para.food_index*2+2] = para.posi_y;
+        food_type[para.food_index] = para.food_type;
+        addFoodOnMap(para.food_index,para.food_type[para.food_index], para.posi_x,para.posi_y);
+    }
+
+    function foodbox(){
+        foodBox = new cc.Sprite(res.scoreBox_png);
+        foodBox.setScaleX(1.2);
+        foodBox.setPosition(180, size.height - 80);
+        foodBox.setOpacity(10);
+        gameLayer.addChild(foodBox);
+    }
+
+    function food_eat(para){
+        HighLog("Food Eat Received");
+        map.removeChild(food[para.food_index], true);
+        userScore[para.index] = para.score;
+        if(para.index == index){
+            ball.setScale(calculatePlayerScale(userScore[index]));
+            speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
+            if(userNames[para.index].length>3){
+                userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
+            }
+            else{
+                userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
+            }
+            scoreLabel.setString("Score: " + para.score);
+
+            //Speed up
+            if(para.food_type == 1)
+            {
+                if(isSpeedUp == false)
+                {
+                    isSpeedUp = true;
+                    speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
+                    window.setTimeout(function(){
+                        isSpeedUp = false;
+                        speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
+                    },POWER_UP_TIME);
+
+                    if(ifPrompt == false){
+                        ifPrompt = true;
+                        promptLabel = displayPrompt(1);
+                        promptBox = displayPromptBox();
+                    }else{
+                        gameLayer.removeChild(promptLabel);
+                        gameLayer.removeChild(promptBox);
+                        promptLabel = displayPrompt(1);
+                        promptBox = displayPromptBox();
+                    }
+                }
+            }
+            else if(para.food_type == 2){
+                if(ifPrompt == false){
+                    ifPrompt = true;
+                    promptLabel = displayPrompt(2);
+                    promptBox = displayPromptBox();
+                }else{
+                    gameLayer.removeChild(promptLabel);
+                    gameLayer.removeChild(promptBox);
+                    promptLabel = displayPrompt(2);
+                    promptBox = displayPromptBox();
+                }
+            }
+            else if(para.food_type == 3)
+            {
+                if(isShrink == false)
+                {
+                    isShrink = true;
+                    ball.setScale(calculatePlayerScale(userScore[index]));
+                    speed = calculateSpeedAlgorithm(ball.getScale());
+                    socket.emit("update_scale", index, ball.getScale(),getUNIXTimestamp());
+                    if(userNames[para.index].length>3){
+                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
+                    }
+                    else{
+                        userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
+                    }
+                    //users[index].setScale(calculatePlayerScale(userScore[index]));
+
+                    window.setTimeout(function(){
+                        isShrink = false;
+                        ball.setScale(calculatePlayerScale(userScore[index]));
+                        speed = calculateSpeedAlgorithm(ball.getScale());
+                        if(userNames[para.index].length>3){
+                            userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
+                        }
+                        else{
+                            userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
+                        }
+                        socket.emit("update_scale", index, ball.getScale(),getUNIXTimestamp());
+                    },POWER_UP_TIME);
+
+                    if(ifPrompt == false){
+                        ifPrompt = true;
+                        promptLabel = displayPrompt(3);
+                        promptBox = displayPromptBox();
+                    }else{
+                        gameLayer.removeChild(promptLabel);
+                        gameLayer.removeChild(promptBox);
+                        promptLabel = displayPrompt(3);
+                        promptBox = displayPromptBox();
+                    }
+
+                }
+         }
+
+            if(para.food_type == 4) {
+                if (isReverse == false) {
+                    isReverse = true;
+
+                    window.setTimeout(function () {
+                        isReverse = false;
+                    }, POWER_UP_TIME);
+
+                    if (ifPrompt == false) {
+                        ifPrompt = true;
+                        promptLabel = displayPrompt(4);
+                        promptBox = displayPromptBox();
+                    } else {
+                        gameLayer.removeChild(promptLabel);
+                        gameLayer.removeChild(promptBox);
+                        promptLabel = displayPrompt(4);
+                        promptBox = displayPromptBox();
+                    }
+                }
+            }
+        }
+        else{
+            users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
+            if(userNames[para.index].length>3){
+                userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
+            }
+            else{
+                userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
+            }
+        }
+    }
+
+    function user_eat(para){
+        //any user who have eat a food will cause this.
+        // if the food index and user index matched, then delete,
+        //new scores will be sent to you
+        HighLog("User Eat Received");
+        userScore[para.index] = para.score;
+        if(para.index == index){
+            ball.setScale(calculatePlayerScale(userScore[para.index]));
+            speed = calculateSpeedAlgorithm(calculatePlayerScale(userScore[index]));
+            if(userNames[para.index].length>3){
+                userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
+            }
+            else{
+                userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
+            }
+            lowLog("YOU HAVE EATEN A USER!");
+        }else{
+            users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
+            if(userNames[para.index].length>3){
+                userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index])*(4/userNames[para.index].length));
+            }
+            else{
+                userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
+            }
+        }
+        if(para.user_index==index){
+            gameOver();
+        }else{
+            map.removeChild(users[para.user_index],true);
+            map.removeChild(userLabels[para.user_index],true);
+        }
+
+        //users.splice(para.user_index,1);
+        //userNames.splice(para.user_index,1);
+        //userScore.splice(index,1);
+        //userSpeed.splice(para.user_index,1);
+        //userStatus.splice(para.user_index,1);
+        //userPos.splice(para.user_index*2,1);
+        //userPos.splice(para.user_index*2+1,1);
+    }
+
+    function specialfood(){
+        var foodLabel = new cc.LabelTTF("Special Food", "Verdana");
+        foodLabel.setScale(1.5);
+        foodLabel.setPosition(180, size.height - 50);
+        foodLabel.setColor(cc.color(47,79,79));
+        gameLayer.addChild(foodLabel);
+
+        var speedupItem = new cc.Sprite(res.speed_up_png);
+        speedupItem.setPosition(50, size.height - 80);
+        gameLayer.addChild(speedupItem);
+        var speedupLabel = new cc.LabelTTF("Speed-up Food", "Optima");
+        speedupLabel.setPosition(120, size.height - 80);
+        speedupLabel.setColor(cc.color(47,79,79));
+        gameLayer.addChild(speedupLabel);
+
+        var poisonItem = new cc.Sprite(res.poison_png);
+        poisonItem.setPosition(220, size.height - 80);
+        gameLayer.addChild(poisonItem);
+        var poisonLabel = new cc.LabelTTF("Poison Food", "Optima");
+        poisonLabel.setPosition(280, size.height - 80);
+        poisonLabel.setColor(cc.color(47,79,79));
+        gameLayer.addChild(poisonLabel);
+
+        var shrinkItem = new cc.Sprite(res.shrink_png);
+        shrinkItem.setPosition(50, size.height - 100);
+        gameLayer.addChild(shrinkItem);
+        var shrinkLabel = new cc.LabelTTF("Shrink Food", "Optima");
+        shrinkLabel.setPosition(120, size.height - 100);
+        shrinkLabel.setColor(cc.color(47,79,79));
+        gameLayer.addChild(shrinkLabel);
+
+        var reverseItem = new cc.Sprite(res.reverse_png);
+        reverseItem.setPosition(220, size.height - 100);
+        gameLayer.addChild(reverseItem);
+        var reverseLabel = new cc.LabelTTF("Reverse Food", "Optima");
+        reverseLabel.setPosition(280, size.height - 100);
+        reverseLabel.setColor(cc.color(47,79,79));
+        gameLayer.addChild(reverseLabel);
+    }
+
+    function olduser(){
+        for(var i=0;i<index;i++){
+            if(userStatus[i] == 'AI'){
+                users[i] = new cc.Sprite(res.AI_png);
+            }
+            else{
+                users[i] = new cc.Sprite(res.ball_png);
+            }
+            users[i].setAnchorPoint(0.5, 0.5);
+            users[i].setScale(calculatePlayerScale(userScore[i]));
+            users[i].setPosition(userPos[i*2],userPos[i*2+1]);
+            if(userStatus[i]!='not started'){
+                map.addChild(users[i],0);
+            }
+        }
+        //old users label
+        for(var i=0; i<userNames.length; i++){
+            if(i!=index){
+                userLabels[i] = new cc.LabelTTF(userNames[i], "Arial");
+                userLabels[i].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+                userLabels[i].setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+                if(userNames[i].length>3){
+                    userLabels[i].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[i])*(4/userNames[i].length));
+                }
+                else{
+                    userLabels[i].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[i]));
+                }
+                userLabels[i].setPosition(users[i].x, users[i].y);
+                userLabels[i].setColor(cc.color(0, 0, 0));
+                if(userStatus[i]!='not started'){
+                    map.addChild(userLabels[i], 0);
+                }
+
+            }
+        }
+    }
 
     function lowLog(msg) {
         //console.log("Low Log: "+ msg);
