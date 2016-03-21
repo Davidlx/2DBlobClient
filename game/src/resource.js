@@ -27,6 +27,10 @@ var res = {
     poison_png:"res/poison.png",
     shrink_png:"res/shrink.png",
     reverse_png:"res/rever.png",
+	intro_bg:"res/intro_bg.png",
+    next_up:"res/next_up.png",
+    next_down:"res/next_down.png",
+    input_box:"res/input_box.png"
     //continue_png:"res/continue.png"
 };
 
