@@ -1,6 +1,6 @@
 
 var HelloWorldLayer = cc.Layer.extend({
-    sprite:null,
+    //sprite:null,
     ctor:function () {
         //////////////////////////////
         // 1. super init first
@@ -12,55 +12,31 @@ var HelloWorldLayer = cc.Layer.extend({
         // ask the window size
         var size = cc.winSize;
 
-        var bg = new cc.Sprite(res.first_bg_png);
-        bg.x = size.width / 2;
-        bg.y = size.height / 2;
-        this.addChild(bg);
-        
-        var title = new cc.Sprite(res.title_png);
-        title.x = size.width / 2+20;
-        title.y = size.height / 2+130;
-        this.addChild(title);
+        var intro_bg = new cc.Sprite(res.intro_bg);
+        intro_bg.x = size.width / 2;
+        intro_bg.y = size.height / 2;
+        this.addChild(intro_bg);
 
-        //add start sprite
-        var startMenuItem = new cc.MenuItemImage(
-            "res/start_up.png",
-            "res/start_down.png",
+        //add next sprite
+        var nextMenuItem = new cc.MenuItemImage(
+            "res/next_up.png",
+            "res/next_down.png",
             function () {
-                cc.log("startMenuItem is clicked!");
-                var str = prompt("Enter your nickname: ", "");
-                while(str.length>8){
-                    str = prompt("The nickname should not longer than 8 characters", "");
-                }
-                socket.emit('user_name', str);
-                cc.director.pushScene(new cc.TransitionFade(1.2,new GameScene()));
+                cc.log("nextMenuItem is clicked!");
+                cc.director.pushScene(new cc.TransitionFade(1.2,new HomeScene()));
             }, this);
-        startMenuItem.x = size.width / 2;
-        startMenuItem.y = size.height - 500;
+        nextMenuItem.x = size.width / 2 + 420;
+        nextMenuItem.y = size.height / 2 + 30;
 
-        //add about sprite
-        var aboutMenuItem = new cc.MenuItemImage(
-            "res/about_up.png",
-            "res/about_down.png",
-            function () {
-                cc.log("aboutMenuItem is clicked!");
-                cc.director.runScene(new cc.TransitionFade(1.2,new AboutScene()));
-            }, this);
-        aboutMenuItem.x = size.width / 2 + 165;
-        aboutMenuItem.y = size.height - 450;
-
-        var mu = new cc.Menu(startMenuItem, aboutMenuItem);
+        var mu = new cc.Menu(nextMenuItem);
         mu.x = 0;
         mu.y = 0;
         this.addChild(mu);
 
     },
 
-    menuItemStartCallback: function (sender) {
+    menuItemNextCallback: function (sender) {
         cc.log("menuItemStartCallback!");
-    },
-    menuItemAboutCallback: function (sender) {
-        cc.log("menuItemAboutCallback!");
     }
 });
 
