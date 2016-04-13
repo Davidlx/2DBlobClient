@@ -39,10 +39,7 @@ var HomeLayer = cc.Layer.extend({
             "res/start_down.png",
             function () {
                 cc.log("startMenuItem is clicked!");
-                var str = prompt("Enter your nickname: ", "");
-                while(str.length>8){
-                    str = prompt("The nickname should not longer than 8 characters", "");
-                }
+                var str = this._box1.getString();
                 socket.emit('user_name', str);
                 cc.director.pushScene(new cc.TransitionFade(1.2,new GameScene()));
             }, this);
