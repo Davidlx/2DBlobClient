@@ -21,17 +21,17 @@ var HomeLayer = cc.Layer.extend({
         title.y = size.height / 2+130;
         this.addChild(title);
 
-        this._box1 = new cc.EditBox(cc.size(200, 40),new cc.Scale9Sprite("res/input_box.png"),new cc.Scale9Sprite("res/input_box.png"),new cc.Scale9Sprite("res/input_box.png"));
-        this._box1.x = cc.winSize.width/2 + 30;
-        this._box1.y = cc.winSize.height/2 - 30;
-        this._box1.setFont("Arial", 20);
-        this._box1.setFontColor(cc.color(0,0,0));
-        this._box1.setPlaceHolder("Enter your nick name");
-        this._box1.setPlaceholderFontColor(cc.color(117, 76, 36));
-        this._box1.setMaxLength(8);
-        this._box1.setReturnType(cc.EditBox.KEYBOARD_RETURNTYPE_DONE);
-        this._box1.setDelegate(this);
-        this.addChild(this._box1);
+        //this._box1 = new cc.EditBox(cc.size(200, 40),new cc.Scale9Sprite("res/input_box.png"),new cc.Scale9Sprite("res/input_box.png"),new cc.Scale9Sprite("res/input_box.png"));
+        //this._box1.x = cc.winSize.width/2 + 30;
+        //this._box1.y = cc.winSize.height/2 - 30;
+        //this._box1.setFont("Arial", 20);
+        //this._box1.setFontColor(cc.color(0,0,0));
+        //this._box1.setPlaceHolder("Enter your nick name");
+        //this._box1.setPlaceholderFontColor(cc.color(117, 76, 36));
+        //this._box1.setMaxLength(8);
+        //this._box1.setReturnType(cc.EditBox.KEYBOARD_RETURNTYPE_DONE);
+        //this._box1.setDelegate(this);
+        //this.addChild(this._box1);
 
         //add start sprite
         var startMenuItem = new cc.MenuItemImage(
