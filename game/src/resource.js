@@ -8,6 +8,7 @@ var res = {
     first_bg_png : "res/first_bg.png",
     game_bg_png : "res/game_bg.png",
     ball_png : "res/ball.png",
+    AI_png :"res/AI.png",
     enemy_png : "res/enemy.png",
     food_red_png : "res/food_red.png",
     food_blue_png : "res/food_blue.png",
@@ -22,6 +23,14 @@ var res = {
     scoreBox_png:"res/scoreBox.png",
     blackBG_png:"res/blackBG.png",
     gameoverBox_png:"res/gameoverBox.png",
+    speed_up_png:"res/speed_up.png",
+    poison_png:"res/poison.png",
+    shrink_png:"res/shrink.png",
+    reverse_png:"res/rever.png",
+	intro_bg:"res/intro_bg.png",
+    next_up:"res/next_up.png",
+    next_down:"res/next_down.png",
+    input_box:"res/input_box.png"
     //continue_png:"res/continue.png"
 };
 
