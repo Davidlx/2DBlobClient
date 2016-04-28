@@ -52,8 +52,6 @@ var GameLayer = cc.Layer.extend({
 
         ctor: function(){
         this._super();
-
-        //socket.emit('user_name','test');
         gameLayer=this;
          map = new cc.TMXTiledMap(res.map_tmx);
 
@@ -71,9 +69,6 @@ var GameLayer = cc.Layer.extend({
                 userPos[i] = para.position[i];
                 userPos[i+1] = para.position[i+1];
             }
-            /*for(var i=0;i<para.food_type.length;i++){
-                food_type[i] = para.food_type[i];
-            }*/
             for(var i=0;i<para.food.length;i+=2){
                 food_posi[i] = para.food[i];
                 food_posi[i+1] = para.food[i+1];
@@ -93,7 +88,6 @@ var GameLayer = cc.Layer.extend({
 
 
             socket.on("User_Add", function(para){
-                lowLog("NEW USER ADD: "+para.index);
                 if(para.ai==true){
                     users[para.index] = new cc.Sprite(res.AI_png);
                 }
@@ -268,14 +262,12 @@ var GameLayer = cc.Layer.extend({
                     ball.speed = speed;
                     move(ball, ball.angle, ball.speed);
                 }
-                //console.log("speed: "+speed);
             }, REFRESH_TIME);
 
             //collision detection
             window.setInterval(function () {
                 for (var i = 0; i < food_type.length; i++) {
                     if (collisionDetection(ball, food[i])) {
-                        //HighLog("Collision: ball "+getUserPosition()[0]+" "+getUserPosition()[1]+ " food: "+food_posi[i*2]+" "+food_posi[i*2+1]);
                         socket.emit('food_eat', index, getUserPosition()[0],getUserPosition()[1],i,getUNIXTimestamp());
                         map.removeChild(food[i], true);
                     }
@@ -287,7 +279,6 @@ var GameLayer = cc.Layer.extend({
                     if(i!=index && userStatus[i]!='not started') {
                         if(collisionDetection(ball, users[i])){
                             socket.emit('eat_user', index, getUserPosition()[0],getUserPosition()[1],i,ball.getScale(),users[i].getScale(),getUNIXTimestamp());
-                            HighLog("User Collision");
                         }
 
                     }
@@ -298,7 +289,6 @@ var GameLayer = cc.Layer.extend({
                 //any user who have eat a food will cause this.
                 // if the food index and user index matched, then delete,
                 //new scores will be sent to you
-                HighLog("Food Eat Received");
                 map.removeChild(food[para.food_index], true);
                 userScore[para.index] = para.score;
                 if(para.index == index){
@@ -364,7 +354,6 @@ var GameLayer = cc.Layer.extend({
                             else{
                                 userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
                             }
-                            //users[index].setScale(calculatePlayerScale(userScore[index]));
 
                             window.setTimeout(function(){
                                 isShrink = false;
@@ -435,7 +424,6 @@ var GameLayer = cc.Layer.extend({
                 //any user who have eat a food will cause this.
                 // if the food index and user index matched, then delete,
                 //new scores will be sent to you
-                HighLog("User Eat Received");
                 userScore[para.index] = para.score;
                 if(para.index == index){
                     ball.setScale(calculatePlayerScale(userScore[para.index]));
@@ -446,7 +434,6 @@ var GameLayer = cc.Layer.extend({
                     else{
                         userLabels[para.index].setFontSize(ballSize / 2 * calculatePlayerScale(userScore[para.index]));
                     }
-                    lowLog("YOU HAVE EATEN A USER!");
                 }else{
                     users[para.index].setScale(calculatePlayerScale(userScore[para.index]));
                     if(userNames[para.index].length>3){
@@ -462,14 +449,6 @@ var GameLayer = cc.Layer.extend({
                     map.removeChild(users[para.user_index],true);
                     map.removeChild(userLabels[para.user_index],true);
                 }
-
-                //users.splice(para.user_index,1);
-                //userNames.splice(para.user_index,1);
-                //userScore.splice(index,1);
-                //userSpeed.splice(para.user_index,1);
-                //userStatus.splice(para.user_index,1);
-                //userPos.splice(para.user_index*2,1);
-                //userPos.splice(para.user_index*2+1,1);
             });
 
             //regular updates
@@ -511,14 +490,12 @@ var GameLayer = cc.Layer.extend({
                         users[para.uid[i]].y = para.position[i*2+1];
                         userLabels[para.uid[i]].x = para.position[i*2];
                         userLabels[para.uid[i]].y = para.position[i*2+1];
-                        HighLog("Update All Pos Proceed: "+para.uid[i] + " X: "+ users[para.uid[i]].x+  " Y: "+ users[para.uid[i]].y);
                     }
                 }
             }
         });
 
         socket.on('user_leave', function(para){
-            lowLog("User "+para.index+" has left 281");
             userStatus[para.index] = 'not started';
             map.removeChild(users[para.index],true);
             map.removeChild(userLabels[para.index],true);
@@ -532,7 +509,6 @@ var GameLayer = cc.Layer.extend({
 
 
         socket.on('timeLag', function(para){
-          lowLog("Sending Time: "+para.sendingTime+" Receive Time "+para.currentTime+" Current Time: "+getUNIXTimestamp());
           network = getUNIXTimestamp() - para.sendingTime;
           var message = "";
           if (network <=50) {
@@ -651,11 +627,6 @@ function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y) {
             reversePointY = 2 * sourcePoint.y - targetPoint.y;
             tempAngle = (Math.atan2(reversePointY - sourcePoint.y, reversePointX - sourcePoint.x));
         }
-        // if (tempAngle != angle) {
-        //     //upload server - angle changed
-        //     //console.log("angle changed");
-        //     socket.emit('update_user_direction',index,getUserPosition()[0],getUserPosition()[1],tempAngle,getUNIXTimestamp());
-        // }
         return tempAngle;
     }
 
@@ -838,16 +809,8 @@ function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y) {
                         window.location.href = "http://tp.sojump.cn/jq/7123174.aspx";
                     }else if(clickLabel == restartLabel){
                         window.location.reload();
-                        /*
-                        window.onbeforeunload = function(){
-                            return "You have chosen to play again";
-                        };*/
                     }else if(clickLabel == exitLabel){
                         window.location.href = "about:blank";
-                        /*
-                        window.open('','_self','');
-                        window.close();
-                        */
                     }
                    
                 }
@@ -855,13 +818,3 @@ function addFoodOnMap(food_index,food_type,food_pos_x,food_pos_y) {
         }, clickLabel);
 
     }
-
-
-    function lowLog(msg) {
-        //console.log("Low Log: "+ msg);
-    }
-
-    function HighLog(msg) {
-        //console.log("High Log: "+ msg);
-    }
-
